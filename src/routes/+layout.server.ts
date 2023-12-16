@@ -1,9 +1,11 @@
 import type { LayoutServerLoad } from './$types';
-import { BASE_URL, GET_USERS_ENDPOINT } from '$env/static/private'
+import { PUBLIC_BASE_URL, PUBLIC_GET_USERS_ENDPOINT } from '$env/static/public'
 
 export const load = (async ({ fetch }) => {
     try {
-        const res = await fetch(BASE_URL + GET_USERS_ENDPOINT)
+        let url = PUBLIC_BASE_URL + PUBLIC_GET_USERS_ENDPOINT
+        console.log("url: ", url)
+        const res = await fetch(url)
         const item = await res.json() as Promise<GetUserData>
         return item
     } catch (error) {

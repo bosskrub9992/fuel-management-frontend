@@ -1,5 +1,8 @@
-import type { PageServerLoad } from './$types';
-import { BASE_URL, GET_FUEL_USAGES_ENDPOINT } from '$env/static/private'
+import type { PageLoad } from './$types';
+import {
+    PUBLIC_BASE_URL,
+    PUBLIC_GET_FUEL_USAGES_ENDPOINT,
+} from '$env/static/public'
 
 export const load = (async ({ fetch, url }) => {
     try {
@@ -10,45 +13,53 @@ export const load = (async ({ fetch, url }) => {
         const query = new URLSearchParams({ currentUserId, currentCarId, pageIndex, pageSize });
         const queryParam = "?" + query.toString();
 
-        const res = await fetch(BASE_URL + GET_FUEL_USAGES_ENDPOINT + queryParam)
-        const item = await res.json() as Promise<GetCarFuelUsageData>
+        let urlGetFuelUsages = PUBLIC_BASE_URL + PUBLIC_GET_FUEL_USAGES_ENDPOINT + queryParam
+        console.log("urlGetFuelUsages: ", urlGetFuelUsages)
 
-        let data: Data = {
-            fuelUsageData: item,
-            currentPageIndex: parseInt(pageIndex),
-            currentPageSize: parseInt(pageSize),
+        let response = await fetch(urlGetFuelUsages)
+
+        if (!response.ok) {
+            const {code, message, data} = await response.json()
+            throw new Error(`code: ${code}, message: ${message}, data: ${data}`);
         }
 
-        return data
+        const { currentPageIndex, currentPageSize, fuelUsageData, todayDate} = await response.json() as GetCarFuelUsageData
 
+        return {
+            currentPageIndex,
+            currentPageSize,
+            fuelUsageData,
+            todayDate,
+        };
     } catch (error) {
         console.log("error: ", error)
         throw error
     }
-
-}) satisfies PageServerLoad;
-
-type Data = {
-    fuelUsageData: Promise<GetCarFuelUsageData>
-    currentPageIndex: number
-    currentPageSize: number
-}
+    
+}) satisfies PageLoad;
 
 type GetCarFuelUsageData = {
+    fuelUsageData: FuelUsageData
+    currentPageIndex: number
+    currentPageSize: number
     todayDate: string
+}
+
+export type FuelUsageData = {
     latestKilometerAfterUse: number
     latestFuelPrice: number
     allUsers: User[]
-    data: CarFuelUsageDatum[]
+    data: CarFuelUsageDatum[] | null
     allCars: Car[]
     totalRecord: number
+    totalPage: number
     currentCar: Car
     currentUser: UserWithImageURL
 }
 
 export type CarFuelUsageDatum = {
     id: number
-    fuelUseDate: string
+    fuelUseTime: string
     fuelPrice: number
     kilometerBeforeUse: number
     kilometerAfterUse: number
@@ -67,8 +78,9 @@ export type User = {
     nickname: string
 }
 
-type UserWithImageURL = {
+export type UserWithImageURL = {
     id: number
     nickname: string
+    defaultCarId: number
     userImageUrl: string
 }

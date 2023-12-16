@@ -15,7 +15,7 @@
 	<div class="md:columns-2 md:gap-52 lg:columns-4">
 		{#each users as user}
 			<a
-				href="/fuel/usages?currentUserId={user.id}&currentCarId={user.defaultCarId}&pageIndex=1&pageSize=20"
+				href="/fuel/usages?currentUserId={user.id}&currentCarId={user.defaultCarId}&pageIndex=1&pageSize=8"
 				class="m-4">
 				<img
 					src={user.profileImageUrl}
@@ -26,4 +26,3 @@
 		{/each}
 	</div>
 </div>
-  
