@@ -24,14 +24,18 @@
 		}
 	}
 	
-	let nextPage = data.pageIndex + 1
-	if (data.pageIndex >= data.totalPage) {
-		nextPage = data.totalPage
+	$: nextPage = data.pageIndex + 1
+	$: {
+		if (data.pageIndex >= data.totalPage) {
+			nextPage = data.totalPage
+		}
 	}
 
-	let previousPage = data.pageIndex - 1
-	if (data.pageIndex <= 1) {
-		previousPage = 1
+	$: previousPage = data.pageIndex - 1
+	$: {
+		if (data.pageIndex <= 1) {
+			previousPage = 1
+		}
 	}
 </script>
 
