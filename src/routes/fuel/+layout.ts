@@ -1,11 +1,11 @@
-import type { LayoutLoad } from './$types';
-import { 
-    PUBLIC_BASE_URL, 
-    PUBLIC_GET_USERS_ENDPOINT, 
+import type { LayoutLoad } from './$types'
+import {
+    PUBLIC_BASE_URL,
+    PUBLIC_GET_USERS_ENDPOINT,
     PUBLIC_GET_CARS_ENDPOINT,
- } from '$env/static/public'
+} from '$env/static/public'
 
-export const load = (async ({fetch, url}) => {
+export const load = (async ({ fetch, url }) => {
     try {
         let currentUserIdString = url.searchParams.get("currentUserId") as string
         let currentCarIdString = url.searchParams.get("currentCarId") as string
@@ -22,19 +22,19 @@ export const load = (async ({fetch, url}) => {
 
         let getCarResponse = await fetch(getCarUrl)
         if (!getCarResponse.ok) {
-            const {code, message, data} = await getCarResponse.json()
-            throw new Error(`code: ${code}, message: ${message}, data: ${data}`);
+            const { code, message, data } = await getCarResponse.json()
+            throw new Error(`code: ${code}, message: ${message}, data: ${data}`)
         }
 
         let getUserResponse = await fetch(getUserUrl)
         if (!getUserResponse.ok) {
-            const {code, message, data} = await getUserResponse.json()
-            throw new Error(`code: ${code}, message: ${message}, data: ${data}`);
+            const { code, message, data } = await getUserResponse.json()
+            throw new Error(`code: ${code}, message: ${message}, data: ${data}`)
         }
 
         const responseGetCars = await getCarResponse.json() as ResponseGetCars
         const responseGetUsers = await getUserResponse.json() as ResponseGetUsers
-        
+
         let allCars = responseGetCars.data
         let allUsers = responseGetUsers.data
 
@@ -53,12 +53,14 @@ export const load = (async ({fetch, url}) => {
         for (const user of allUsers) {
             if (user.id === currentUserId) {
                 currentUser = user
+                break
             }
         }
 
         for (const car of allCars) {
             if (car.id === currentCarId) {
                 currentCar = car
+                break
             }
         }
 
@@ -74,26 +76,10 @@ export const load = (async ({fetch, url}) => {
         }
 
     } catch (error) {
-        console.log("error: ", error)
+        console.error("error: ", error)
         throw error
     }
-}) satisfies LayoutLoad;
-
-type LoadData = {
-    allUsers: UserWithImageURL[]
-    allCars: Car[]
-    currentUserId: number
-    currentCarId: number
-    pageIndex: number
-    pageSize: number
-}
-
-type GetCarFuelUsageData = {
-    fuelUsageData: FuelUsageData
-    currentPageIndex: number
-    currentPageSize: number
-    todayDate: string
-}
+}) satisfies LayoutLoad
 
 export type FuelUsageData = {
     latestKilometerAfterUse: number
