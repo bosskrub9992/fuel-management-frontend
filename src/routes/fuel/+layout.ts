@@ -1,8 +1,8 @@
 import type { LayoutLoad } from './$types'
 import {
     PUBLIC_BASE_URL,
-    PUBLIC_GET_USERS_ENDPOINT,
-    PUBLIC_GET_CARS_ENDPOINT,
+    PUBLIC_USERS_ENDPOINT,
+    PUBLIC_CARS_ENDPOINT,
 } from '$env/static/public'
 
 export const load = (async ({ fetch, url }) => {
@@ -17,8 +17,8 @@ export const load = (async ({ fetch, url }) => {
         let pageIndex: number = parseInt(pageIndexString)
         let pageSize: number = parseInt(pageSizeString)
 
-        let getCarUrl = PUBLIC_BASE_URL + PUBLIC_GET_CARS_ENDPOINT
-        let getUserUrl = PUBLIC_BASE_URL + PUBLIC_GET_USERS_ENDPOINT
+        let getCarUrl = PUBLIC_BASE_URL + PUBLIC_CARS_ENDPOINT
+        let getUserUrl = PUBLIC_BASE_URL + PUBLIC_USERS_ENDPOINT
 
         let getCarResponse = await fetch(getCarUrl)
         if (!getCarResponse.ok) {
@@ -38,31 +38,13 @@ export const load = (async ({ fetch, url }) => {
         let allCars = responseGetCars.data
         let allUsers = responseGetUsers.data
 
-        let currentUser: UserWithImageURL = {
-            id: 0,
-            nickname: "",
-            profileImageUrl: "",
-            defaultCarId: 0,
-        }
+        let currentUser = allUsers.find((obj) => {
+            return obj.id === currentUserId
+        })
 
-        let currentCar: Car = {
-            id: 0,
-            name: "",
-        }
-
-        for (const user of allUsers) {
-            if (user.id === currentUserId) {
-                currentUser = user
-                break
-            }
-        }
-
-        for (const car of allCars) {
-            if (car.id === currentCarId) {
-                currentCar = car
-                break
-            }
-        }
+        let currentCar = allCars.find((obj) => {
+            return obj.id === currentCarId
+        })
 
         return {
             allCars,

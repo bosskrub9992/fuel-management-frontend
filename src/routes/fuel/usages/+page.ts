@@ -1,7 +1,7 @@
 import type { PageLoad } from './$types'
 import {
     PUBLIC_BASE_URL,
-    PUBLIC_GET_FUEL_USAGES_ENDPOINT,
+    PUBLIC_FUEL_USAGES_ENDPOINT,
 } from '$env/static/public'
 
 type GetFuelUsagesResponse = {
@@ -21,6 +21,16 @@ export type FuelUsageDatum = {
     fuelUsers: string
 }
 
+const allStatus = [
+    "noStatus",
+    "failed",
+    "success",
+    "updateSuccess",
+    "updateFailed",
+    "deleteSuccess",
+    "deleteFailed",
+]
+
 export const load = (async ({ fetch, url }) => {
     try {
         let currentUserId = url.searchParams.get("currentUserId") as string
@@ -30,7 +40,7 @@ export const load = (async ({ fetch, url }) => {
         const query = new URLSearchParams({ currentUserId, currentCarId, pageIndex, pageSize })
         const queryParam = "?" + query.toString()
 
-        let urlGetFuelUsages = PUBLIC_BASE_URL + PUBLIC_GET_FUEL_USAGES_ENDPOINT + queryParam
+        let urlGetFuelUsages = PUBLIC_BASE_URL + PUBLIC_FUEL_USAGES_ENDPOINT + queryParam
         console.info(`GET ${urlGetFuelUsages}`)
 
         let response = await fetch(urlGetFuelUsages)
@@ -45,8 +55,7 @@ export const load = (async ({ fetch, url }) => {
         let showToast = "noStatus"
         let rawShowToast = url.searchParams.get("showToast")
         if (rawShowToast !== null) {
-            let s = ["noStatus", "failed", "success"]
-            if (s.includes(rawShowToast)) {
+            if (allStatus.includes(rawShowToast)) {
                 showToast = rawShowToast
             }
         }

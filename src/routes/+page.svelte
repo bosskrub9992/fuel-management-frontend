@@ -3,7 +3,7 @@
 
 	export let data;
 
-	let users: GetUserDatum[];
+	let users: GetUserDatum[] = [];
 	if (data.data) {
 		users = data.data
 	}

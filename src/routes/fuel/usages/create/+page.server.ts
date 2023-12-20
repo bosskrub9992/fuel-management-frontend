@@ -3,7 +3,7 @@ import { redirect } from '@sveltejs/kit'
 import {
     PUBLIC_BASE_URL,
     PUBLIC_GET_LATEST_FUEL_INFO_ENDPOINT,
-    PUBLIC_POST_FUEL_USAGES_ENDPOINT,
+    PUBLIC_FUEL_USAGES_ENDPOINT,
 } from '$env/static/public'
 
 type GetLatestFuelInfoResponse = {
@@ -30,7 +30,7 @@ export const load = (async ({ fetch }) => {
             latestKilometerAfterUse
         }
     } catch (error) {
-        console.log("error: ", error)
+        console.error("error: ", error)
         throw error
     }
 }) satisfies PageServerLoad
@@ -97,7 +97,7 @@ export const actions = {
         let redirectUrl = `/fuel/usages?currentUserId=${currentUserId}&currentCarId=${currentCarId}&pageIndex=1&pageSize=8&showToast=success`
 
         try {
-            let urlCreateFuelUsages = PUBLIC_BASE_URL + PUBLIC_POST_FUEL_USAGES_ENDPOINT
+            let urlCreateFuelUsages = PUBLIC_BASE_URL + PUBLIC_FUEL_USAGES_ENDPOINT
             console.info(`POST ${urlCreateFuelUsages}, request body: ${createFuelUsageRequest}`)
 
             let response = await fetch(urlCreateFuelUsages, {
@@ -116,7 +116,6 @@ export const actions = {
         } catch (error) {
             console.error("error: ", error)
             redirectUrl = `/fuel/usages?currentUserId=${currentUserId}&currentCarId=${currentCarId}&pageIndex=1&pageSize=8&showToast=failed`
-            throw error
         }
 
         redirect(303, redirectUrl)
