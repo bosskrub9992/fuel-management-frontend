@@ -11,13 +11,16 @@ type GetLatestFuelInfoResponse = {
     latestKilometerAfterUse: number
 }
 
-export const load = (async ({ fetch }) => {
+export const load = (async ({ fetch, url }) => {
     try {
-        let urlGetLatestFuelInfo = PUBLIC_BASE_URL + PUBLIC_GET_LATEST_FUEL_INFO_ENDPOINT
+        let currentCarId = url.searchParams.get("currentCarId") as string
+
+        const query = new URLSearchParams({ carId: currentCarId })
+        const queryParam = "?" + query.toString()
+        let urlGetLatestFuelInfo = PUBLIC_BASE_URL + PUBLIC_GET_LATEST_FUEL_INFO_ENDPOINT + queryParam
         console.info(`GET ${urlGetLatestFuelInfo}`)
 
         let response = await fetch(urlGetLatestFuelInfo)
-
         if (!response.ok) {
             const { code, message, data } = await response.json()
             throw new Error(`code: ${code}, message: ${message}, data: ${data}`)
@@ -36,7 +39,7 @@ export const load = (async ({ fetch }) => {
 }) satisfies PageServerLoad
 
 type CreateFuelUsageRequest = {
-    currentCarId: number //
+    currentCarId: number
     fuelUseTime: string // RFC3339 / ISO8601
     fuelPrice: number
     fuelUsers: FuelUser[]
