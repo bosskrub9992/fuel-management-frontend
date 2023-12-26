@@ -1,36 +1,128 @@
-<script lang="ts">    
-    import type { PageData } from './$types';
-    import { onMount } from "svelte";
-
-    export let data: PageData;
-
-    onMount(async () => {
+<script lang="ts">
+	import type { PageData } from './$types';
+	import { onMount } from "svelte";
+	import type { FuelRefillDatum } from "./+page.ts";
+	import { goto } from '$app/navigation';
+	export let data: PageData;
+	console.log(data)
+	onMount(async () => {
 		const { initFlowbite } = await import('flowbite');
 		initFlowbite();
 	});
+
+	$: to = Math.min(
+		data.pageIndex * data.pageSize, 
+		data.fuelRefill.totalRecord,
+	)
+
+	$: showing = (data.pageIndex - 1) * data.pageSize + 1
+	
+	let fuelRefillData :FuelRefillDatum[] = []
+	$: if (data.fuelRefill.fuelRefillData) {
+		fuelRefillData = data.fuelRefill.fuelRefillData
+	}
+	
+	$: nextPage = data.pageIndex + 1
+	$: if (data.pageIndex >= data.fuelRefill.totalPage) {
+		nextPage = data.fuelRefill.totalPage
+	}
+
+	$: previousPage = data.pageIndex - 1
+	$: if (data.pageIndex <= 1) {
+		previousPage = 1
+	}
+
+	let toastMessage = "" // case noStatus
+	switch (data.fuelRefill.showToast) {
+	case "noStatus":
+		toastMessage = ""
+		break;
+	case "success":
+		toastMessage = "เพิ่มการใช้รถ สำเร็จแล้ว"
+		break;
+	case "updateSuccess":
+		toastMessage = "แก้ไขการใช้รถ สำเร็จแล้ว"
+		break;
+	case "deleteSuccess":
+		toastMessage = "ลบการใช้รถ สำเร็จแล้ว"
+		break;
+	case "failed":
+		toastMessage = "เพิ่มการใช้รถ ไม่สำเร็จ"
+		break;
+	case "updateFailed":
+		toastMessage = "แก้ไขการใช้รถ ไม่สำเร็จ"
+		break;
+	case "deleteFailed":
+		toastMessage = "ลบการใช้รถ ไม่สำเร็จ"
+		break;
+	default:
+		toastMessage = "เกิดข้อผิดพลาดบางอย่าง"
+		console.error("data.showToast: ", data.fuelRefill.showToast)
+		break;
+	}
 </script>
 
-เติมน้ำมัน
-
-<button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">Dropdown button <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-	<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-	</svg>
-	</button>
-	
-	<!-- Dropdown menu -->
-	<div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-		<ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
-		  <li>
-			<a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Dashboard</a>
-		  </li>
-		  <li>
-			<a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Settings</a>
-		  </li>
-		  <li>
-			<a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Earnings</a>
-		  </li>
-		  <li>
-			<a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Sign out</a>
-		  </li>
-		</ul>
+ <!-- table -->
+ <section class="bg-gray-50 dark:bg-gray-900 p-3 sm:p-0 antialiased">
+	<div class="mx-auto max-w-screen-xl px-0 lg:px-12">
+		<div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+			<div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
+				<div class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
+					<a href="/fuel/usages/create?currentUserId={data.currentUser?.id}&currentCarId={data.currentCar?.id}"
+						class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+                        <svg class="h-3.5 w-3.5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path clip-rule="evenodd" fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
+                        </svg>
+						เพิ่มรายการเติมน้ำมัน
+					</a>
+				</div>
+			</div>
+			<div class="overflow-x-auto">
+				<table class="w-full text-sm text-center text-gray-500 dark:text-gray-400">
+					<thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+						<tr>
+							<th scope="col" class="px-2 py-3">วันที่</th>
+							<th scope="col" class="px-2 py-3">กม. ก่อนเติมน้ำมัน</th>
+							<th scope="col" class="px-2 py-3">กม. หลังเติมน้ำมัน</th>
+							<th scope="col" class="px-2 py-3">เป็นเงิน (บาท)</th>
+							<th scope="col" class="px-2 py-3">ราคาน้ำมัน (บาท/กม.)</th>
+							<th scope="col" class="px-2 py-3">สถานะการจ่าย</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each fuelRefillData as fuelRefillDatum }
+							<tr on:click={()=>{goto(`/fuel/usages/${fuelRefillDatum.id}?currentUserId=${data.currentUser?.id}&currentCarId=${data.currentCar?.id}`)}} class="border-b dark:border-gray-700">
+								<td id="td-{fuelRefillDatum.id}-RefillTime" class="px-2 py-3"> {fuelRefillDatum.refillTime}</td>
+								<td id="td-{fuelRefillDatum.id}-KilometerBeforeRefill" class="px-2 py-3 align-middle">{fuelRefillDatum.kilometerBeforeRefill}</td>
+								<td id="td-{fuelRefillDatum.id}-KilometerAfterRefill" class="px-2 py-3">{fuelRefillDatum.kilometerAfterRefill}</td>
+								<td id="td-{fuelRefillDatum.id}-TotalMoney" class="px-2 py-3 max-w-[12rem] truncate">{fuelRefillDatum.totalMoney}</td>
+								<td id="td-{fuelRefillDatum.id}-FuelPriceCalculated" class="px-2 py-3">{fuelRefillDatum.fuelPriceCalculated}</td>
+								<td id="td-{fuelRefillDatum.id}-IsPaid" class="px-2 py-3">{fuelRefillDatum.isPaid}</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+			<nav>
+				<div class="flex flex-col items-center p-3">
+					<span class="text-sm text-gray-700 dark:text-gray-400">
+						Showing 
+						<span class="font-semibold text-gray-900 dark:text-white">{showing}</span>
+						 to 
+						<span class="font-semibold text-gray-900 dark:text-white">{to}</span>
+						 of 
+						 <span class="font-semibold text-gray-900 dark:text-white">{data.fuelRefill.totalRecord}</span> Entries
+					</span>
+					<div class="inline-flex mt-2 xs:mt-0">
+						<a href="/fuel/usages?currentUserId={data.currentUser?.id}&currentCarId={data.currentCar?.id}&pageIndex={previousPage}&pageSize=8" class="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 rounded-s hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+							Prev
+						</a>
+						<a href="/fuel/usages?currentUserId={data.currentUser?.id}&currentCarId={data.currentCar?.id}&pageIndex={nextPage}&pageSize=8" class="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 border-0 border-s border-gray-700 rounded-e hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+							Next
+						</a>
+					</div>
+				</div>
+			</nav>
+		</div>
 	</div>
+</section>
