@@ -68,7 +68,7 @@
 		<div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
 			<div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
 				<div class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-					<a href="/fuel/usages/create?currentUserId={data.currentUser?.id}&currentCarId={data.currentCar?.id}"
+					<a href="/fuel/refills/create?currentUserId={data.currentUser?.id}&currentCarId={data.currentCar?.id}"
 						class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
                         <svg class="h-3.5 w-3.5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                             <path clip-rule="evenodd" fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
@@ -91,7 +91,7 @@
 					</thead>
 					<tbody>
 						{#each fuelRefillData as fuelRefillDatum }
-							<tr on:click={()=>{goto(`/fuel/usages/${fuelRefillDatum.id}?currentUserId=${data.currentUser?.id}&currentCarId=${data.currentCar?.id}`)}} class="border-b dark:border-gray-700">
+							<tr on:click={()=>{goto(`/fuel/refills/${fuelRefillDatum.id}?currentUserId=${data.currentUser?.id}&currentCarId=${data.currentCar?.id}`)}} class="border-b dark:border-gray-700">
 								<td id="td-{fuelRefillDatum.id}-RefillTime" class="px-2 py-3"> {fuelRefillDatum.refillTime}</td>
 								<td id="td-{fuelRefillDatum.id}-KilometerBeforeRefill" class="px-2 py-3 align-middle">{fuelRefillDatum.kilometerBeforeRefill}</td>
 								<td id="td-{fuelRefillDatum.id}-KilometerAfterRefill" class="px-2 py-3">{fuelRefillDatum.kilometerAfterRefill}</td>
@@ -114,10 +114,10 @@
 						 <span class="font-semibold text-gray-900 dark:text-white">{data.fuelRefill.totalRecord}</span> Entries
 					</span>
 					<div class="inline-flex mt-2 xs:mt-0">
-						<a href="/fuel/usages?currentUserId={data.currentUser?.id}&currentCarId={data.currentCar?.id}&pageIndex={previousPage}&pageSize=8" class="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 rounded-s hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+						<a href="/fuel/refills?currentUserId={data.currentUser?.id}&currentCarId={data.currentCar?.id}&pageIndex={previousPage}&pageSize=8" class="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 rounded-s hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
 							Prev
 						</a>
-						<a href="/fuel/usages?currentUserId={data.currentUser?.id}&currentCarId={data.currentCar?.id}&pageIndex={nextPage}&pageSize=8" class="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 border-0 border-s border-gray-700 rounded-e hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+						<a href="/fuel/refills?currentUserId={data.currentUser?.id}&currentCarId={data.currentCar?.id}&pageIndex={nextPage}&pageSize=8" class="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 border-0 border-s border-gray-700 rounded-e hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
 							Next
 						</a>
 					</div>

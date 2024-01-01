@@ -1,14 +1,12 @@
 import type { PageLoad } from './$types';
-
-type GetFuelRefillResponse = {
-    fuelUsageData: FuelRefillDatum[] | null
-    totalRecord: number
-    totalPage: number
-}
+import {
+    PUBLIC_BASE_URL,
+    PUBLIC_FUEL_REFILLS_ENDPOINT,
+} from '$env/static/public'
 
 export type FuelRefillDatum = {
     id: number
-    refillTime: Date
+    refillTime: string
     kilometerBeforeRefill: number
     kilometerAfterRefill: number
     totalMoney: string
@@ -16,8 +14,14 @@ export type FuelRefillDatum = {
     isPaid: boolean
 }
 
+type GetFuelRefillsResponse = {
+    fuelRefillData: FuelRefillDatum[] | null
+    totalRecord: number
+    totalPage: number
+}
+
 export type FuelRefill = {
-    fuelRefillData: FuelRefillDatum[]
+    fuelRefillData: FuelRefillDatum[] | null
     showToast: string
     totalRecord: number
     totalPage: number
@@ -37,29 +41,20 @@ export const load = (async ({ fetch, url }) => {
     try {
         let currentUserId = url.searchParams.get("currentUserId") as string
         let currentCarId = url.searchParams.get("currentCarId") as string
-        let pageIndex = '1'
-        let pageSize = '10'
+        let pageIndex = url.searchParams.get("pageIndex") as string
+        let pageSize = url.searchParams.get("pageSize") as string
+        const query = new URLSearchParams({ currentUserId, currentCarId, pageIndex, pageSize })
+        const queryParam = "?" + query.toString()
 
-        let fuelRefillData: FuelRefillDatum[] = [
-            {
-                id: 1,
-                refillTime: new Date('2023-12-12'),
-                kilometerBeforeRefill: 100,
-                kilometerAfterRefill: 100,
-                totalMoney: '100',
-                fuelPriceCalculated: 100,
-                isPaid: false,
-            },
-            {
-                id: 2,
-                refillTime: new Date('2023-11-11'),
-                kilometerBeforeRefill: 200,
-                kilometerAfterRefill: 200,
-                totalMoney: '200',
-                fuelPriceCalculated: 200,
-                isPaid: false,
-            }
-        ]
+        let urlGetFuelRefills = PUBLIC_BASE_URL + PUBLIC_FUEL_REFILLS_ENDPOINT + queryParam
+        let response = await fetch(urlGetFuelRefills)
+
+        if (!response.ok) {
+            const { code, message, data } = await response.json()
+            throw new Error(`code: ${code}, message: ${message}, data: ${data}`)
+        }
+
+        const { fuelRefillData, totalRecord, totalPage } = await response.json() as GetFuelRefillsResponse
         let showToast = "noStatus"
         let rawShowToast = url.searchParams.get("showToast")
         if (rawShowToast !== null) {
@@ -71,8 +66,8 @@ export const load = (async ({ fetch, url }) => {
         let fuelRefill: FuelRefill = {
             fuelRefillData: fuelRefillData,
             showToast: showToast,
-            totalPage: 5,
-            totalRecord: 2,
+            totalPage: totalPage,
+            totalRecord: totalRecord,
         }
         return {
             fuelRefill
