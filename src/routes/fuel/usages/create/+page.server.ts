@@ -13,14 +13,14 @@ type GetLatestFuelInfoResponse = {
 
 export const load = (async ({ fetch, url }) => {
     try {
-        let currentCarId = url.searchParams.get("currentCarId") as string
+        const currentCarId = url.searchParams.get("currentCarId") as string
 
         const query = new URLSearchParams({ carId: currentCarId })
         const queryParam = "?" + query.toString()
-        let urlGetLatestFuelInfo = PUBLIC_BASE_URL + PUBLIC_GET_LATEST_FUEL_INFO_ENDPOINT + queryParam
+        const urlGetLatestFuelInfo = PUBLIC_BASE_URL + PUBLIC_GET_LATEST_FUEL_INFO_ENDPOINT + queryParam
         console.info(`GET ${urlGetLatestFuelInfo}`)
 
-        let response = await fetch(urlGetLatestFuelInfo)
+        const response = await fetch(urlGetLatestFuelInfo)
         if (!response.ok) {
             const { code, message, data } = await response.json()
             throw new Error(`code: ${code}, message: ${message}, data: ${data}`)
@@ -66,14 +66,14 @@ export const actions = {
         const currentCarId = Number(data.get('currentCarId'))
         const currentUserId = Number(data.get('currentUserId'))
 
-        let paidUserIds = new Map<number, boolean>()
+        const paidUserIds = new Map<number, boolean>()
         for (const rawPaidFuelUserId of rawPaidFuelUserIds) {
             paidUserIds.set(Number(rawPaidFuelUserId), true)
         }
 
-        let fuelUsers: FuelUser[] = []
+        const fuelUsers: FuelUser[] = []
         for (const rawFuelUserId of rawFuelUserIds) {
-            let userId = Number(rawFuelUserId)
+            const userId = Number(rawFuelUserId)
             let isPaid: boolean = false
             if (paidUserIds.has(userId)) {
                 isPaid = true
@@ -87,7 +87,7 @@ export const actions = {
         const temp = new Date(rawFuelUseTime)
         const fuelUseTime = temp.toISOString()
 
-        let createFuelUsageRequest: CreateFuelUsageRequest = {
+        const createFuelUsageRequest: CreateFuelUsageRequest = {
             currentCarId: currentCarId,
             fuelUseTime: fuelUseTime,
             fuelPrice: fuelPrice,
@@ -100,10 +100,10 @@ export const actions = {
         let redirectUrl = `/fuel/usages?currentUserId=${currentUserId}&currentCarId=${currentCarId}&pageIndex=1&pageSize=8&showToast=success`
 
         try {
-            let urlCreateFuelUsages = PUBLIC_BASE_URL + PUBLIC_FUEL_USAGES_ENDPOINT
+            const urlCreateFuelUsages = PUBLIC_BASE_URL + PUBLIC_FUEL_USAGES_ENDPOINT
             console.info(`POST ${urlCreateFuelUsages}, request body: ${createFuelUsageRequest}`)
 
-            let response = await fetch(urlCreateFuelUsages, {
+            const response = await fetch(urlCreateFuelUsages, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
