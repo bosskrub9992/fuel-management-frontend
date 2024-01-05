@@ -24,12 +24,12 @@ type GetFuelUser = {
 
 export const load = (async ({ fetch, params }) => {
     try {
-        let fuelUsageId = Number(params.fuelUsageId)
+        const fuelUsageId = Number(params.fuelUsageId)
 
-        let urlGetFuelUsageById = PUBLIC_BASE_URL + PUBLIC_FUEL_USAGES_ENDPOINT + `/${fuelUsageId}`
+        const urlGetFuelUsageById = PUBLIC_BASE_URL + PUBLIC_FUEL_USAGES_ENDPOINT + `/${fuelUsageId}`
         console.info(`GET ${urlGetFuelUsageById}`)
 
-        let response = await fetch(urlGetFuelUsageById)
+        const response = await fetch(urlGetFuelUsageById)
         if (!response.ok) {
             const { code, message, data } = await response.json()
             throw new Error(`code: ${code}, message: ${message}, data: ${data}`)
@@ -76,14 +76,14 @@ export const actions = {
         const rawFuelUserIds = data.getAll('fuelUserId') as string[]
         const rawPaidFuelUserIds = data.getAll('paidFuelUserId') as string[]
 
-        let paidUserIds = new Map<number, boolean>()
+        const paidUserIds = new Map<number, boolean>()
         for (const rawPaidFuelUserId of rawPaidFuelUserIds) {
             paidUserIds.set(Number(rawPaidFuelUserId), true)
         }
 
-        let fuelUsers: FuelUser[] = []
+        const fuelUsers: FuelUser[] = []
         for (const rawFuelUserId of rawFuelUserIds) {
-            let userId = Number(rawFuelUserId)
+            const userId = Number(rawFuelUserId)
             let isPaid = false
             if (paidUserIds.has(userId)) {
                 isPaid = true
@@ -97,7 +97,7 @@ export const actions = {
         const temp = new Date(rawFuelUseTime)
         const fuelUseTime = temp.toISOString()
 
-        let putFuelUsageRequest: PutFuelUsageRequest = {
+        const putFuelUsageRequest: PutFuelUsageRequest = {
             currentCarId: currentCarId,
             fuelUseTime: fuelUseTime,
             fuelPrice: fuelPrice,
@@ -110,10 +110,10 @@ export const actions = {
         let showToast = "updateSuccess"
 
         try {
-            let urlPutFuelUsageById = PUBLIC_BASE_URL + PUBLIC_FUEL_USAGES_ENDPOINT + `/${fuelUsageId}`
+            const urlPutFuelUsageById = PUBLIC_BASE_URL + PUBLIC_FUEL_USAGES_ENDPOINT + `/${fuelUsageId}`
             console.info(`PUT ${urlPutFuelUsageById}, request body: ${putFuelUsageRequest}`)
 
-            let response = await fetch(urlPutFuelUsageById, {
+            const response = await fetch(urlPutFuelUsageById, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ export const actions = {
             showToast = "updateFailed"
         }
 
-        let redirectUrl = `/fuel/usages?currentUserId=${currentUserId}&currentCarId=${currentCarId}&pageIndex=1&pageSize=8&showToast=${showToast}`
+        const redirectUrl = `/fuel/usages?currentUserId=${currentUserId}&currentCarId=${currentCarId}&pageIndex=1&pageSize=8&showToast=${showToast}`
         redirect(303, redirectUrl)
     },
     deleteFuelUsage: async ({ request, fetch }) => {
@@ -143,10 +143,10 @@ export const actions = {
         let showToast = "deleteSuccess"
 
         try {
-            let urlDeleteFuelUsage = PUBLIC_BASE_URL + PUBLIC_FUEL_USAGES_ENDPOINT + `/${fuelUsageId}`
+            const urlDeleteFuelUsage = PUBLIC_BASE_URL + PUBLIC_FUEL_USAGES_ENDPOINT + `/${fuelUsageId}`
             console.info(`DELETE ${urlDeleteFuelUsage}`)
 
-            let response = await fetch(urlDeleteFuelUsage, {
+            const response = await fetch(urlDeleteFuelUsage, {
                 method: 'DELETE',
             })
             if (!response.ok) {
@@ -159,7 +159,7 @@ export const actions = {
             showToast = "deleteFailed"
         }
 
-        let redirectUrl = `/fuel/usages?currentUserId=${currentUserId}&currentCarId=${currentCarId}&pageIndex=1&pageSize=8&showToast=${showToast}`
+        const redirectUrl = `/fuel/usages?currentUserId=${currentUserId}&currentCarId=${currentCarId}&pageIndex=1&pageSize=8&showToast=${showToast}`
         redirect(303, redirectUrl)
     },
 } satisfies Actions
