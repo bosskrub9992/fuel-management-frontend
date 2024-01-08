@@ -59,7 +59,7 @@
 	}
 
 	function isPaidDisplay(input: boolean): string {
-		if (input == false) {
+		if (input == true) {
 			return '✅';
 		} else {
 			return '❌';

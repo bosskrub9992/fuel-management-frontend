@@ -33,17 +33,17 @@ const allStatus = [
 
 export const load = (async ({ fetch, url }) => {
     try {
-        let currentUserId = url.searchParams.get("currentUserId") as string
-        let currentCarId = url.searchParams.get("currentCarId") as string
-        let pageIndex = url.searchParams.get("pageIndex") as string
-        let pageSize = url.searchParams.get("pageSize") as string
+        const currentUserId = url.searchParams.get("currentUserId") as string
+        const currentCarId = url.searchParams.get("currentCarId") as string
+        const pageIndex = url.searchParams.get("pageIndex") as string
+        const pageSize = url.searchParams.get("pageSize") as string
         const query = new URLSearchParams({ currentUserId, currentCarId, pageIndex, pageSize })
         const queryParam = "?" + query.toString()
 
-        let urlGetFuelUsages = PUBLIC_BASE_URL + PUBLIC_FUEL_USAGES_ENDPOINT + queryParam
+        const urlGetFuelUsages = PUBLIC_BASE_URL + PUBLIC_FUEL_USAGES_ENDPOINT + queryParam
         console.info(`GET ${urlGetFuelUsages}`)
 
-        let response = await fetch(urlGetFuelUsages)
+        const response = await fetch(urlGetFuelUsages)
 
         if (!response.ok) {
             const { code, message, data } = await response.json()
@@ -53,7 +53,7 @@ export const load = (async ({ fetch, url }) => {
         const { fuelUsageData, totalRecord, totalPage } = await response.json() as GetFuelUsagesResponse
 
         let showToast = "noStatus"
-        let rawShowToast = url.searchParams.get("showToast")
+        const rawShowToast = url.searchParams.get("showToast")
         if (rawShowToast !== null) {
             if (allStatus.includes(rawShowToast)) {
                 showToast = rawShowToast
