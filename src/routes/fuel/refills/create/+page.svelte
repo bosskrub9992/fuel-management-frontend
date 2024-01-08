@@ -50,7 +50,7 @@
 						for="fuelUserIds">สถานะการจ่ายเงินจากกองกลาง</label
 					>
 					<div class="flex items-center space-x-4">
-						<div class="flex items-center">
+						<div class="flex items-center pt-3">
 							<input
 								id="isPaid"
 								type="checkbox"
@@ -140,14 +140,14 @@
 					bind:value={data.currentUserId}
 					class="hidden"
 				/>
-				<button
-					type="submit"
-					formaction="?/createFuelRefill"
-					class="inline-flex items-center px-5 py-2.5 text-md font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800"
-				>
-					เพิ่มการเติมน้ำมัน
-				</button>
 			</div>
+			<button
+				type="submit"
+				formaction="?/createFuelRefill"
+				class="inline-flex items-center px-5 py-2.5 text-md font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800"
+			>
+				เพิ่มการเติมน้ำมัน
+			</button>
 		</form>
 	</div>
 </section>
