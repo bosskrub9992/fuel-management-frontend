@@ -35,22 +35,22 @@
 			toastMessage = '';
 			break;
 		case 'success':
-			toastMessage = 'เพิ่มการใช้รถ สำเร็จแล้ว';
+			toastMessage = 'เพิ่มการเติมน้ำมัน สำเร็จแล้ว';
 			break;
 		case 'updateSuccess':
-			toastMessage = 'แก้ไขการใช้รถ สำเร็จแล้ว';
+			toastMessage = 'แก้ไขการเติมน้ำมัน สำเร็จแล้ว';
 			break;
 		case 'deleteSuccess':
-			toastMessage = 'ลบการใช้รถ สำเร็จแล้ว';
+			toastMessage = 'ลบการเติมน้ำมัน สำเร็จแล้ว';
 			break;
 		case 'failed':
-			toastMessage = 'เพิ่มการใช้รถ ไม่สำเร็จ';
+			toastMessage = 'เพิ่มการเติมน้ำมัน ไม่สำเร็จ';
 			break;
 		case 'updateFailed':
-			toastMessage = 'แก้ไขการใช้รถ ไม่สำเร็จ';
+			toastMessage = 'แก้ไขการเติมน้ำมัน ไม่สำเร็จ';
 			break;
 		case 'deleteFailed':
-			toastMessage = 'ลบการใช้รถ ไม่สำเร็จ';
+			toastMessage = 'ลบการเติมน้ำมัน ไม่สำเร็จ';
 			break;
 		default:
 			toastMessage = 'เกิดข้อผิดพลาดบางอย่าง';
