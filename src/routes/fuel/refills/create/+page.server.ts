@@ -55,38 +55,15 @@ export const actions = {
 		const data = await request.formData();
 		const kilometerBeforeRefill = Number(data.get('kilometerBeforeRefill'));
 		const kilometerAfterRefill = Number(data.get('kilometerAfterRefill'));
-		// const rawFuelUserIds = data.getAll('fuelUserId') as string[];
-		// const rawPaidFuelUserIds = data.getAll('paidFuelUserId') as string[];
-
 		const currentCarId = Number(data.get('currentCarId'));
 		const currentUserId = Number(data.get('currentUserId'));
 		const isPaid = Boolean(data.get('isPaid'));
 		const totalMoney = Number(data.get('totalMoney'));
-		const rawFuelUseTime = data.get('refillTime') as string;
-
-		// const paidUserIds = new Map<number, boolean>();
-		// for (const rawPaidFuelUserId of rawPaidFuelUserIds) {
-		// 	paidUserIds.set(Number(rawPaidFuelUserId), true);
-		// }
-
-		// const fuelUsers: FuelUser[] = [];
-		// for (const rawFuelUserId of rawFuelUserIds) {
-		// 	const userId = Number(rawFuelUserId);
-		// 	let isPaid: boolean = false;
-		// 	if (paidUserIds.has(userId)) {
-		// 		isPaid = true;
-		// 	}
-		// 	fuelUsers.push({
-		// 		userId: userId,
-		// 		isPaid: isPaid
-		// 	});
-		// }
-		const temp = new Date(rawFuelUseTime)
-        const refillTime = temp.toISOString()
+		const rawRefillTime = data.get('refillTime') as string;
 
 		const createFuelRefillRequest: CreateFuelRefillRequest = {
 			currentCarId: currentCarId,
-			refillTime: refillTime,
+			refillTime: rawRefillTime + ":00+07:00",
 			kilometerBeforeRefill: kilometerBeforeRefill,
 			kilometerAfterRefill: kilometerAfterRefill,
 			totalMoney: totalMoney,
