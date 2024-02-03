@@ -56,20 +56,17 @@ export const actions = {
 		const rawRefillTime = data.get('refillTime') as string; // format 2006-01-02T15:04
 		const kilometerBeforeRefill = Number(data.get('kilometerBeforeRefill'));
 		const kilometerAfterRefill = Number(data.get('kilometerAfterRefill'));
-        const totalMoney = Number(data.get("totalMoney"))
-        const isPaid = Boolean(data.get("isPaid"))
-
-		const temp = new Date(rawRefillTime);
-		const fuelRefillTime = temp.toISOString();
+		const totalMoney = Number(data.get("totalMoney"))
+		const isPaid = Boolean(data.get("isPaid"))
 
 		const putFuelRefillRequest: PutFuelRefillRequest = {
 			currentCarId: currentCarId,
-            currentUserId: currentUserId,
-            refillTime: fuelRefillTime,
-            kilometerBeforeRefill: kilometerBeforeRefill,
-            kilometerAfterRefill: kilometerAfterRefill,
-            totalMoney: totalMoney,
-            isPaid: isPaid,
+			currentUserId: currentUserId,
+			refillTime: rawRefillTime + ":00+07:00",
+			kilometerBeforeRefill: kilometerBeforeRefill,
+			kilometerAfterRefill: kilometerAfterRefill,
+			totalMoney: totalMoney,
+			isPaid: isPaid,
 		};
 
 		let showToast = 'updateSuccess';

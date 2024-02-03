@@ -94,12 +94,9 @@ export const actions = {
             })
         }
 
-        const temp = new Date(rawFuelUseTime)
-        const fuelUseTime = temp.toISOString()
-
         const putFuelUsageRequest: PutFuelUsageRequest = {
             currentCarId: currentCarId,
-            fuelUseTime: fuelUseTime,
+            fuelUseTime: rawFuelUseTime + ":00+07:00",
             fuelPrice: fuelPrice,
             fuelUsers: fuelUsers,
             description: description,
