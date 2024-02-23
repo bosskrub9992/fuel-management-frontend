@@ -1,16 +1,18 @@
 export type getUserUnpaidFuelUsagesResponse = {
-    userFuelUsages: userFuelUsage[];
-};
+    userFuelUsages: userFuelUsage[]
+}
 
 export type userFuelUsage = {
     car: {
-        id: number;
-        name: string;
-    };
+        id: number
+        name: string
+    }
     fuelUsages: {
-        id: number;
-        fuelUsageUserId: number;
-        fuelUseTime: string;
-        payEach: string;
-    };
-};
+        fuelUsageId: number
+        fuelUsageUserId: number
+        fuelUseTime: string
+        payEach: string
+        description: string
+        fuelUsers: string
+    }[]
+}
