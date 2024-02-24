@@ -226,9 +226,15 @@
                     <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
                         <div class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
                             {#if !$cars[i].isPaying }
-                                <button on:click={()=>{pay(i)}} class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
-                                    จ่ายเงิน
-                                </button>
+                                {#if $cars[i].selectedFuelUsageUserIds.length == 0 }
+                                    <button on:click={()=>{pay(i)}} class="flex items-center justify-center text-white bg-primary-500 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-400 cursor-not-allowed" disabled>
+                                        จ่ายเงิน
+                                    </button>
+                                {:else}
+                                    <button on:click={()=>{pay(i)}} class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+                                        จ่ายเงิน
+                                    </button>
+                                {/if}
                             {:else}
                                 <button disabled type="button" class="py-2.5 px-5 me-2 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 inline-flex items-center">
                                     <svg aria-hidden="true" role="status" class="inline w-4 h-4 me-3 text-gray-200 animate-spin dark:text-gray-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
