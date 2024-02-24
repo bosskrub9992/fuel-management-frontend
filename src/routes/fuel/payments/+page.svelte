@@ -20,6 +20,7 @@
         allFuelUsageUserIds: number[]
         allTotalMoney: number
         allSelected: boolean
+        isPaying: boolean
     }
 
     const cars = writable<car[]>([])
@@ -42,7 +43,8 @@
                     selectedTotalMoney: 0,
                     allFuelUsageUserIds: [],
                     allTotalMoney: 0,
-                    allSelected: true
+                    allSelected: true,
+                    isPaying: false
                 }]
                 for (const fuelUsage of userUnpaidFuelUsages.userFuelUsages[carIdx].fuelUsages) {
                     $cars[carIdx] = {
@@ -51,7 +53,8 @@
                         selectedTotalMoney: $cars[carIdx].selectedTotalMoney + parseFloat(fuelUsage.payEach),
                         allFuelUsageUserIds: [...$cars[carIdx].allFuelUsageUserIds, fuelUsage.fuelUsageUserId],
                         allTotalMoney: $cars[carIdx].allTotalMoney + parseFloat(fuelUsage.payEach),
-                        allSelected: true
+                        allSelected: true,
+                        isPaying: false
                     }
                 }
             }
@@ -87,10 +90,8 @@
         }
     }
 
-    $: paying = false
-
     function pay(carIdx: number) {
-        paying = true
+        $cars[carIdx].isPaying = true
 
         let req: patchUserFuelUsagesPaymentStatusRequest = {
             userFuelUsages: []
@@ -110,7 +111,7 @@
                 displayToast("paymentFailed")
             })
             .finally(() => {
-                paying = false
+                $cars[carIdx].isPaying = false
             })
     }
 
@@ -125,9 +126,6 @@
     function reloadPage(showToast: string) {
         $page.url.searchParams.set("showToast", showToast)
         const thisPage = $page.url.toString();
-
-        console.log('goto ' + thisPage);
-
         goto('/').then(
             () => goto(thisPage)
         );
@@ -227,7 +225,7 @@
                     </div>
                     <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
                         <div class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-                            {#if !paying }
+                            {#if !$cars[i].isPaying }
                                 <button on:click={()=>{pay(i)}} class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
                                     จ่ายเงิน
                                 </button>
