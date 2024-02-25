@@ -132,14 +132,14 @@
     }
 </script>
 
-
+<!-- toast notification -->
 {#if showToast != null && showToast == "paymentSucceeded"}
     <ToastSucceeded toastMessage="จ่ายเงิน สำเร็จ" />
-
 {:else if showToast != null && showToast == "paymentFailed"}
     <ToastFailed toastMessage="จ่ายเงิน ไม่สำเร็จ" />
 {/if}
 
+<!-- content -->
 {#if isLoading }
     <div class="min-h-screen flex items-center justify-center">
         <Spinner/>
@@ -157,7 +157,7 @@
     <h2 class="pl-4 mb-4 text-xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl dark:text-white">รายการรอคุณจ่าย</h2>
     {#each userUnpaidFuelUsages.userFuelUsages as userFuelUsage, i }
         <!-- table -->
-        <section class="bg-gray-50 dark:bg-gray-900 p-3 sm:p-0 antialiased">
+        <section class="bg-gray-50 dark:bg-gray-900 p-3 antialiased">
             <div class="mx-auto max-w-screen-xl px-0 lg:px-12">
                 <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
                     <div class="text-sm flex flex-row px-3 py-3">
