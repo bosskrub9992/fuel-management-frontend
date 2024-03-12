@@ -55,7 +55,7 @@
 <div class="h-16 bg-white"></div>
 <nav>
 	<div class="fixed bottom-0 left-0 z-50 w-full h-16 bg-white border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
-		<div class="grid h-full max-w-lg grid-cols-2 mx-auto font-medium">
+		<div class="grid h-full max-w-lg grid-cols-3 mx-auto font-medium">
 			<a 
 				href="{`/fuel/refills?currentUserId=${data.currentUser?.id}&currentCarId=${data.currentCar?.id}&pageIndex=1&pageSize=8`}"
 				class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group">
@@ -65,6 +65,11 @@
 				href="{`/fuel/usages?currentUserId=${data.currentUser?.id}&currentCarId=${data.currentCar?.id}&pageIndex=1&pageSize=8`}" 
 				class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group">
 				<span class="text-md text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500">ใช้รถ</span>
+			</a>
+			<a 
+				href="{`/fuel/payments/?currentUserId=${data.currentUser?.id}&currentCarId=${data.currentCar?.id}`}" 
+				class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group">
+				<span class="text-md text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500">จ่ายเงิน</span>
 			</a>
 		</div>
 	</div>
