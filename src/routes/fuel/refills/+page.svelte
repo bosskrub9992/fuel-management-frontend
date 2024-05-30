@@ -4,7 +4,7 @@
 	import type { FuelRefillDatum } from './+page.ts';
 	import { goto } from '$app/navigation';
 	export let data: PageData;
-	console.log(data);
+
 	onMount(async () => {
 		const { initFlowbite } = await import('flowbite');
 		initFlowbite();
@@ -111,6 +111,7 @@
 							<th scope="col" class="px-2 py-3">เป็นเงิน (บาท)</th>
 							<th scope="col" class="px-2 py-3">ราคาน้ำมัน (บาท/กม.)</th>
 							<th scope="col" class="px-2 py-3">สถานะการจ่ายจากกองกลาง</th>
+							<th scope="col" class="px-2 py-3">คนเติมน้ำมัน</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -141,6 +142,9 @@
 								>
 								<td id="td-{fuelRefillDatum.id}-IsPaid" class="px-2 py-3"
 									>{isPaidDisplay(fuelRefillDatum.isPaid)}</td
+								>
+								<td id="td-{fuelRefillDatum.id}-RefillBy" class="px-2 py-3"
+									>{data.userIdToNickname.get(fuelRefillDatum.refillBy)}</td
 								>
 							</tr>
 						{/each}

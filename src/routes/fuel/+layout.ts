@@ -46,6 +46,11 @@ export const load = (async ({ fetch, url }) => {
             return obj.id === currentCarId
         })
 
+        let userIdToNickname = new Map<number, string>()
+        for (const user of allUsers) {
+            userIdToNickname.set(user.id, user.nickname)
+        }
+
         return {
             allCars,
             allUsers,
@@ -55,6 +60,7 @@ export const load = (async ({ fetch, url }) => {
             pageSize,
             currentUser,
             currentCar,
+            userIdToNickname,
         }
 
     } catch (error) {

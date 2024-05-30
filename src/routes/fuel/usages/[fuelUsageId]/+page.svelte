@@ -35,21 +35,7 @@
 	let hour = ('0' + fuelUseTime.getHours()).slice(-2);
 	let minute = ('0' + fuelUseTime.getMinutes()).slice(-2);
 	let fuelUseTimeBind = `${year}-${month}-${date}T${hour}:${minute}`;
-
-    let userIdToNickname = new Map<number, string>()
-    for (const user of data.allUsers) {
-        userIdToNickname.set(user.id, user.nickname)
-    }
-
-    function getNicknameByUserId(userId:number) :string {
-        let userNickname = userIdToNickname.get(userId)
-        if (userNickname) {
-            return userNickname
-        }
-        return ""
-    }
 </script>
-
 
 <section class="bg-white dark:bg-gray-900">
     <div class="py-2 px-4 mx-auto max-w-2xl lg:py-16">
@@ -82,7 +68,7 @@
                             {#each fuelUserIds as fuelUserId}
                                 <div class="flex items-center">
                                     <input id="inline-checkbox" type="checkbox" name="paidFuelUserId" value={fuelUserId} bind:group={paidUsers} class="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                    <label for="inline-checkbox" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{getNicknameByUserId(fuelUserId)}</label>
+                                    <label for="inline-checkbox" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{data.userIdToNickname.get(fuelUserId)}</label>
                                 </div>
                             {/each}
                         </div>

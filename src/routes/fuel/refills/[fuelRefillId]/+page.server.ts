@@ -9,6 +9,7 @@ type GetFuelRefillByIDResponse = {
 	totalMoney: number;
 	fuelPriceCalculated: number;
 	isPaid: boolean;
+	refillBy: number
 };
 
 export const load = (async ({ fetch, params }) => {
@@ -45,6 +46,7 @@ type PutFuelRefillRequest = {
 	kilometerAfterRefill: number;
 	totalMoney: number;
 	isPaid: boolean;
+	refillBy: number
 };
 
 export const actions = {
@@ -58,6 +60,7 @@ export const actions = {
 		const kilometerAfterRefill = Number(data.get('kilometerAfterRefill'));
 		const totalMoney = Number(data.get("totalMoney"))
 		const isPaid = Boolean(data.get("isPaid"))
+		const refillBy = Number(data.get("refillBy"))
 
 		const putFuelRefillRequest: PutFuelRefillRequest = {
 			currentCarId: currentCarId,
@@ -67,6 +70,7 @@ export const actions = {
 			kilometerAfterRefill: kilometerAfterRefill,
 			totalMoney: totalMoney,
 			isPaid: isPaid,
+			refillBy: refillBy,
 		};
 
 		let showToast = 'updateSuccess';

@@ -48,6 +48,7 @@ type CreateFuelRefillRequest = {
 	totalMoney: number;
 	isPaid: boolean;
 	currentUserId: number;
+	refillBy: number;
 };
 
 export const actions = {
@@ -60,6 +61,7 @@ export const actions = {
 		const isPaid = Boolean(data.get('isPaid'));
 		const totalMoney = Number(data.get('totalMoney'));
 		const rawRefillTime = data.get('refillTime') as string;
+		const refillBy = Number(data.get("refillBy"))
 
 		const createFuelRefillRequest: CreateFuelRefillRequest = {
 			currentCarId: currentCarId,
@@ -68,7 +70,8 @@ export const actions = {
 			kilometerAfterRefill: kilometerAfterRefill,
 			totalMoney: totalMoney,
 			isPaid: isPaid,
-			currentUserId: currentUserId
+			currentUserId: currentUserId,
+			refillBy: refillBy,
 		};
 
 		let redirectUrl = `/fuel/refills?currentUserId=${currentUserId}&currentCarId=${currentCarId}&pageIndex=1&pageSize=8&showToast=success`;

@@ -9,6 +9,7 @@ export type FuelRefillDatum = {
 	totalMoney: string;
 	fuelPriceCalculated: number;
 	isPaid: boolean;
+	refillBy: number;
 };
 
 type GetFuelRefillsResponse = {

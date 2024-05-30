@@ -23,6 +23,8 @@
 			isPaid = true;
 		}
 	}
+
+	let refillBy = data.getFuelRefillByIdResponse.refillBy
 </script>
 
 <section class="bg-white dark:bg-gray-900">
@@ -65,6 +67,33 @@
 								class="ml-2 text-sm font-sm text-gray-900 dark:text-gray-300">กองกลางจ่ายแล้ว</label
 							>
 						</div>
+					</div>
+				</div>
+				<div>
+					<label
+						class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+						for="paidFuelUserIds"
+					>
+						คนที่เติมน้ำมัน
+					</label>
+					<div class="flex items-center space-x-4">
+						{#each data.allUsers as user}
+							<div class="flex items-center">
+								<input
+									id="inline-radio"
+									type="radio"
+									name="refillBy"
+									value={user.id}
+									bind:group={refillBy}
+									class="w-4 h-4 border-gray-300 focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-600 dark:focus:bg-blue-600 dark:bg-gray-700 dark:border-gray-600"
+								/>
+								<label
+									for="inline-radio"
+									class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+									>{user.nickname}</label
+								>
+							</div>
+						{/each}
 					</div>
 				</div>
 				<div>
