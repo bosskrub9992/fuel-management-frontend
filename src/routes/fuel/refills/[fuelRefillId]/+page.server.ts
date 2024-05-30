@@ -65,7 +65,7 @@ export const actions = {
 		const putFuelRefillRequest: PutFuelRefillRequest = {
 			currentCarId: currentCarId,
 			currentUserId: currentUserId,
-			refillTime: rawRefillTime + ":00+07:00",
+			refillTime: rawRefillTime + "+07:00",
 			kilometerBeforeRefill: kilometerBeforeRefill,
 			kilometerAfterRefill: kilometerAfterRefill,
 			totalMoney: totalMoney,

@@ -34,7 +34,8 @@
 	let date = ('0' + fuelUseTime.getDate()).slice(-2);
 	let hour = ('0' + fuelUseTime.getHours()).slice(-2);
 	let minute = ('0' + fuelUseTime.getMinutes()).slice(-2);
-	let fuelUseTimeBind = `${year}-${month}-${date}T${hour}:${minute}`;
+    let second = ('0' + fuelUseTime.getSeconds()).slice(-2);
+	let fuelUseTimeBind = `${year}-${month}-${date}T${hour}:${minute}:${second}`;
 </script>
 
 <section class="bg-white dark:bg-gray-900">
@@ -51,6 +52,7 @@
 					>
 					<input
 						type="datetime-local"
+                        step="1"
 						name="fuelUseTime"
 						id="fuelUseTime"
 						class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"

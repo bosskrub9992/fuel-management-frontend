@@ -96,7 +96,7 @@ export const actions = {
 
         const putFuelUsageRequest: PutFuelUsageRequest = {
             currentCarId: currentCarId,
-            fuelUseTime: rawFuelUseTime + ":00+07:00",
+            fuelUseTime: rawFuelUseTime + "+07:00",
             fuelPrice: fuelPrice,
             fuelUsers: fuelUsers,
             description: description,
