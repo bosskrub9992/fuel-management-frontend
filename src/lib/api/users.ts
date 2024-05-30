@@ -49,7 +49,7 @@ export type fuelUsageUser = {
 export async function patchUserFuelUsagesPaymentStatus(userId: number, request: patchUserFuelUsagesPaymentStatusRequest) {
     let urlPatchUserFuelUsagesPaymentStatus = `${PUBLIC_BASE_URL}${PUBLIC_USERS_ENDPOINT}/${userId}/fuel-usages/payment-status`
 
-    console.log(`PATCH ${urlPatchUserFuelUsagesPaymentStatus}`)
+    console.log(`PATCH ${urlPatchUserFuelUsagesPaymentStatus}, request body: ${JSON.stringify(request)}`)
 
     const res = await fetch(urlPatchUserFuelUsagesPaymentStatus, {
         method: 'PATCH',

@@ -108,7 +108,7 @@ export const actions = {
 
         try {
             const urlPutFuelUsageById = PUBLIC_BASE_URL + PUBLIC_FUEL_USAGES_ENDPOINT + `/${fuelUsageId}`
-            console.info(`PUT ${urlPutFuelUsageById}, request body: ${putFuelUsageRequest}`)
+            console.info(`PUT ${urlPutFuelUsageById}, request body: ${JSON.stringify(putFuelUsageRequest)}`)
 
             const response = await fetch(urlPutFuelUsageById, {
                 method: 'PUT',

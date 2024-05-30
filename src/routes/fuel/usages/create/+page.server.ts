@@ -98,7 +98,7 @@ export const actions = {
 
         try {
             const urlCreateFuelUsages = PUBLIC_BASE_URL + PUBLIC_FUEL_USAGES_ENDPOINT
-            console.info(`POST ${urlCreateFuelUsages}, request body: ${createFuelUsageRequest}`)
+            console.info(`POST ${urlCreateFuelUsages}, request body: ${JSON.stringify(createFuelUsageRequest)}`)
 
             const response = await fetch(urlCreateFuelUsages, {
                 method: 'POST',

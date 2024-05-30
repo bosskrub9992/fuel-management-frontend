@@ -78,7 +78,7 @@ export const actions = {
 
 		try {
 			const urlCreateFuelRefills = PUBLIC_BASE_URL + PUBLIC_FUEL_REFILLS_ENDPOINT;
-			console.info(`POST ${urlCreateFuelRefills}, request body: ${createFuelRefillRequest}`);
+			console.info(`POST ${urlCreateFuelRefills}, request body: ${JSON.stringify(createFuelRefillRequest)}`);
 
 			const response = await fetch(urlCreateFuelRefills, {
 				method: 'POST',

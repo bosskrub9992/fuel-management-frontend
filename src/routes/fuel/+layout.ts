@@ -20,11 +20,15 @@ export const load = (async ({ fetch, url }) => {
         let getCarUrl = PUBLIC_BASE_URL + PUBLIC_CARS_ENDPOINT
         let getUserUrl = PUBLIC_BASE_URL + PUBLIC_USERS_ENDPOINT
 
+        console.info(`GET ${getCarUrl}`)
+
         let getCarResponse = await fetch(getCarUrl)
         if (!getCarResponse.ok) {
             const { code, message, data } = await getCarResponse.json()
             throw new Error(`code: ${code}, message: ${message}, data: ${data}`)
         }
+
+        console.info(`GET ${getUserUrl}`)
 
         let getUserResponse = await fetch(getUserUrl)
         if (!getUserResponse.ok) {
