@@ -10,7 +10,7 @@
 	let description = '';
 	$: total = fuelPrice * (kilometerBeforeUse - kilometerAfterUse)
     $: totalString = total.toFixed(2)
-    let fuelUserIds: number[] = []
+    let fuelUserIds: number[] = [data.currentUserId]
     let paidUsers: number[] = []
     $: payEach = total;
     $: {
@@ -26,7 +26,8 @@
 	let date = ('0' + now.getDate()).slice(-2);
 	let hour = ('0' + now.getHours()).slice(-2);
 	let minute = ('0' + now.getMinutes()).slice(-2);
-	let nowBind = `${year}-${month}-${date}T${hour}:${minute}`;
+	let second = ('0' + now.getSeconds()).slice(-2);
+	let nowBind = `${year}-${month}-${date}T${hour}:${minute}:${second}`;
 
     let userIdToNickname = new Map<number, string>()
     for (const user of data.allUsers) {
@@ -40,6 +41,8 @@
         }
         return ""
     }
+
+    $: disableButton = fuelUserIds.length == 0 
 </script>
 
 <section class="bg-white dark:bg-gray-900">
@@ -49,14 +52,19 @@
             <div class="grid gap-4 mb-4 md:gap-6 md:grid-cols-2 sm:mb-8">
                 <div>
                     <label for="fuelUseTime" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">วันที่</label>
-                    <input type="datetime-local" name="fuelUseTime" id="fuelUseTime" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" bind:value={nowBind} required>
+                    <input type="datetime-local" step="1" name="fuelUseTime" id="fuelUseTime" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" bind:value={nowBind} required>
                 </div>
                 <div>
                     <label for="fuelPrice" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ราคาน้ำมัน</label>
                     <input type="number" name="fuelPrice" id="fuelPrice" bind:value={fuelPriceDisplay} class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" readonly required>
                 </div>
                 <div>
-                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="fuelUserIds">คนนั่ง</label>
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="fuelUserIds">
+                        คนนั่ง 
+                        {#if fuelUserIds.length == 0 }
+                            <span class="text-red-500">* กรุณาเลือกอย่างน้อย 1 คน</span>
+                        {/if}
+                    </label>
                     <div class="flex items-center space-x-4">
                         {#each data.allUsers as user}
                             <div class="flex items-center">
@@ -102,9 +110,15 @@
                 <input type="number" name="currentCarId" id="currentCarId" bind:value={data.currentCarId} class="hidden">
                 <input type="number" name="currentUserId" id="currentUserId" bind:value={data.currentUserId} class="hidden">
             </div>
-            <button type="submit" formaction="?/createFuelUsage" class="inline-flex items-center px-5 py-2.5 text-md font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
-               เพิ่มการใช้รถ
-            </button>
+           {#if disableButton }
+                <button type="submit" disabled class="inline-flex items-center px-5 py-2.5 text-md font-medium text-center text-white bg-primary-400 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-600 hover:bg-primary-500 cursor-not-allowed">
+                    เพิ่มการใช้รถ
+                </button>
+            {:else}
+                <button type="submit" formaction="?/createFuelUsage" class="inline-flex items-center px-5 py-2.5 text-md font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
+                    เพิ่มการใช้รถ
+                </button>
+           {/if}
         </form>
     </div>
 </section>

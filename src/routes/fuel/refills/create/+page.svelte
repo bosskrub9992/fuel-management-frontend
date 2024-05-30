@@ -15,7 +15,8 @@
 	let date = ('0' + now.getDate()).slice(-2);
 	let hour = ('0' + now.getHours()).slice(-2);
 	let minute = ('0' + now.getMinutes()).slice(-2);
-	let nowBind = `${year}-${month}-${date}T${hour}:${minute}`;
+	let second = ('0' + now.getSeconds()).slice(-2);
+	let nowBind = `${year}-${month}-${date}T${hour}:${minute}:${second}`;
 
 	let userIdToNickname = new Map<number, string>();
 	for (const user of data.allUsers) {
@@ -37,6 +38,7 @@
 					>
 					<input
 						type="datetime-local"
+						step="1"
 						name="refillTime"
 						id="refillTime"
 						class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
