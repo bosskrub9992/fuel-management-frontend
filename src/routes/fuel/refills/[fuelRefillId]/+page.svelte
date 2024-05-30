@@ -24,7 +24,7 @@
 		}
 	}
 
-	let refillBy = data.getFuelRefillByIdResponse.refillBy
+	let refillBy = data.getFuelRefillByIdResponse.refillBy;
 </script>
 
 <section class="bg-white dark:bg-gray-900">
