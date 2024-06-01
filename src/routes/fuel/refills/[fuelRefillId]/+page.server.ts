@@ -55,7 +55,7 @@ export const actions = {
 		const fuelRefillId = Number(data.get('fuelRefillId'));
 		const currentCarId = Number(data.get('currentCarId'));
 		const currentUserId = Number(data.get('currentUserId'));
-		const rawRefillTime = data.get('refillTime') as string; // format 2006-01-02T15:04
+		const refillTime = data.get('refillTime') as string;
 		const kilometerBeforeRefill = Number(data.get('kilometerBeforeRefill'));
 		const kilometerAfterRefill = Number(data.get('kilometerAfterRefill'));
 		const totalMoney = Number(data.get("totalMoney"))
@@ -65,7 +65,7 @@ export const actions = {
 		const putFuelRefillRequest: PutFuelRefillRequest = {
 			currentCarId: currentCarId,
 			currentUserId: currentUserId,
-			refillTime: rawRefillTime + "+07:00",
+			refillTime: refillTime,
 			kilometerBeforeRefill: kilometerBeforeRefill,
 			kilometerAfterRefill: kilometerAfterRefill,
 			totalMoney: totalMoney,
@@ -74,18 +74,20 @@ export const actions = {
 		};
 
 		let showToast = 'updateSuccess';
+		let requestBody = JSON.stringify(putFuelRefillRequest)
 
 		try {
 			const urlPutFuelRefillById =
 				PUBLIC_BASE_URL + PUBLIC_FUEL_REFILLS_ENDPOINT + `/${fuelRefillId}`;
-			console.info(`PUT ${urlPutFuelRefillById}, request body: ${JSON.stringify(putFuelRefillRequest)}`);
+
+			console.info(`PUT ${urlPutFuelRefillById}, request body: ${requestBody}`);
 
 			const response = await fetch(urlPutFuelRefillById, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify(putFuelRefillRequest)
+				body: requestBody
 			});
 			if (!response.ok) {
 				const { code, message, data } = await response.json();
@@ -111,6 +113,7 @@ export const actions = {
 		try {
 			const urlDeleteFuelRefill =
 				PUBLIC_BASE_URL + PUBLIC_FUEL_REFILLS_ENDPOINT + `/${fuelRefillId}`;
+
 			console.info(`DELETE ${urlDeleteFuelRefill}`);
 
 			const response = await fetch(urlDeleteFuelRefill, {

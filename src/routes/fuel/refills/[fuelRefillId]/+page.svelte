@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { onMount } from 'svelte';
+	import flatpickr from 'flatpickr';
 
 	export let data: PageData;
 
@@ -9,14 +11,33 @@
 	$: pricePerKm = totalMoney / (kilometerAfterRefill - kilometerBeforeRefill);
 	$: pricePerKmString = pricePerKm.toFixed(2);
 
-	let fuelRefillTime = new Date(data.getFuelRefillByIdResponse.refillTime);
-	let year = fuelRefillTime.getFullYear();
-	let month = ('0' + (fuelRefillTime.getMonth() + 1)).slice(-2);
-	let date = ('0' + fuelRefillTime.getDate()).slice(-2);
-	let hour = ('0' + fuelRefillTime.getHours()).slice(-2);
-	let minute = ('0' + fuelRefillTime.getMinutes()).slice(-2);
-	let second = ('0' + fuelRefillTime.getSeconds()).slice(-2);
-	let fuelRefillTimeBind = `${year}-${month}-${date}T${hour}:${minute}:${second}`;
+	let defaultRefillTime = new Date(data.getFuelRefillByIdResponse.refillTime);
+	let year = defaultRefillTime.getFullYear();
+	let month = ('0' + (defaultRefillTime.getMonth() + 1)).slice(-2);
+	let date = ('0' + defaultRefillTime.getDate()).slice(-2);
+	let hour = ('0' + defaultRefillTime.getHours()).slice(-2);
+	let minute = ('0' + defaultRefillTime.getMinutes()).slice(-2);
+	let second = ('0' + defaultRefillTime.getSeconds()).slice(-2);
+
+	let refillTime = `${year}-${month}-${date}T${hour}:${minute}:${second}`;
+	let refillTimeInputElement: HTMLElement;
+
+	onMount(() => {
+		flatpickr(refillTimeInputElement, {
+			disableMobile: true,
+			allowInput: true,
+			clickOpens: true,
+			enableTime: true,
+			dateFormat: 'Y-m-dTH:i:S+07:00',
+			altInput: true,
+			altFormat: 'j F Y h:i:S K',
+			enableSeconds: true,
+			defaultDate: defaultRefillTime,
+			onValueUpdate: (selectedDates, dateStr, instance) => {
+				refillTime = dateStr;
+			}
+		});
+	});
 
 	$: isPaid = false;
 	$: {
@@ -41,12 +62,11 @@
 						class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">วันที่</label
 					>
 					<input
-						type="datetime-local"
-						step="1"
 						name="refillTime"
 						id="refillTime"
 						class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-						bind:value={fuelRefillTimeBind}
+						bind:value={refillTime}
+						bind:this={refillTimeInputElement}
 						required
 					/>
 				</div>

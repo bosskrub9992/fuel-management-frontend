@@ -19,6 +19,7 @@ export const load = (async ({ fetch, url }) => {
 		const queryParam = '?' + query.toString();
 		const urlGetLatestFuelInfo =
 			PUBLIC_BASE_URL + PUBLIC_GET_LATEST_FUEL_INFO_ENDPOINT + queryParam;
+
 		console.info(`GET ${urlGetLatestFuelInfo}`);
 
 		const response = await fetch(urlGetLatestFuelInfo);
@@ -60,12 +61,12 @@ export const actions = {
 		const currentUserId = Number(data.get('currentUserId'));
 		const isPaid = Boolean(data.get('isPaid'));
 		const totalMoney = Number(data.get('totalMoney'));
-		const rawRefillTime = data.get('refillTime') as string;
+		const refillTime = data.get('refillTime') as string;
 		const refillBy = Number(data.get("refillBy"))
 
 		const createFuelRefillRequest: CreateFuelRefillRequest = {
 			currentCarId: currentCarId,
-			refillTime: rawRefillTime + "+07:00",
+			refillTime: refillTime,
 			kilometerBeforeRefill: kilometerBeforeRefill,
 			kilometerAfterRefill: kilometerAfterRefill,
 			totalMoney: totalMoney,
@@ -75,17 +76,18 @@ export const actions = {
 		};
 
 		let redirectUrl = `/fuel/refills?currentUserId=${currentUserId}&currentCarId=${currentCarId}&pageIndex=1&pageSize=8&showToast=success`;
+		let requestBody = JSON.stringify(createFuelRefillRequest)
 
 		try {
 			const urlCreateFuelRefills = PUBLIC_BASE_URL + PUBLIC_FUEL_REFILLS_ENDPOINT;
-			console.info(`POST ${urlCreateFuelRefills}, request body: ${JSON.stringify(createFuelRefillRequest)}`);
+			console.info(`POST ${urlCreateFuelRefills}, request body: ${requestBody}`);
 
 			const response = await fetch(urlCreateFuelRefills, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify(createFuelRefillRequest)
+				body: requestBody
 			});
 
 			if (!response.ok) {

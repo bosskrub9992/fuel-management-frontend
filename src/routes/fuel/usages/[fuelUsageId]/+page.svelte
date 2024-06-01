@@ -31,7 +31,6 @@
 	$: payEachDisplay = payEach.toFixed(2);
 
 	let defaultFuelUseTime = new Date(data.getFuelUsageByIdResponse.fuelUseTime);
-
 	let year = defaultFuelUseTime.getFullYear();
 	let month = ('0' + (defaultFuelUseTime.getMonth() + 1)).slice(-2);
 	let date = ('0' + defaultFuelUseTime.getDate()).slice(-2);
