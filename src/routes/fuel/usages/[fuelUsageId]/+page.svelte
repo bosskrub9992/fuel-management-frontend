@@ -44,6 +44,7 @@
 
 	onMount(() => {
 		flatpickr(fuelUseTimeInputElement, {
+			disableMobile: true,
 			allowInput: true,
 			clickOpens: true,
 			enableTime: true,
