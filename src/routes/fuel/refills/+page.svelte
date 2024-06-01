@@ -3,6 +3,8 @@
 	import { onMount } from 'svelte';
 	import type { FuelRefillDatum } from './+page.ts';
 	import { goto } from '$app/navigation';
+	import ToastFailed from '$lib/components/toastFailed.svelte';
+	import ToastSucceeded from '$lib/components/toastSucceeded.svelte';
 	export let data: PageData;
 
 	onMount(async () => {
@@ -66,6 +68,15 @@
 		}
 	}
 </script>
+
+<!-- toast notification -->
+{#if data.fuelRefill.showToast != null}
+	{#if data.fuelRefill.showToast === 'success' || data.fuelRefill.showToast === 'updateSuccess' || data.fuelRefill.showToast === 'deleteSuccess'}
+		<ToastSucceeded {toastMessage} />
+	{:else if data.fuelRefill.showToast === 'failed' || data.fuelRefill.showToast === 'updateFailed' || data.fuelRefill.showToast === 'deleteFailed'}
+		<ToastFailed {toastMessage} />
+	{/if}
+{/if}
 
 <!-- table -->
 <section class="bg-gray-50 dark:bg-gray-900 p-3 sm:p-0 antialiased">
