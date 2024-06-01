@@ -86,7 +86,7 @@ export const actions = {
 
         const createFuelUsageRequest: CreateFuelUsageRequest = {
             currentCarId: currentCarId,
-            fuelUseTime: rawFuelUseTime + "+07:00",
+            fuelUseTime: rawFuelUseTime,
             fuelPrice: fuelPrice,
             fuelUsers: fuelUsers,
             description: description,
@@ -94,18 +94,19 @@ export const actions = {
             kilometerAfterUse: kilometerAfterUse,
         }
 
+        let requestBody = JSON.stringify(createFuelUsageRequest)
         let redirectUrl = `/fuel/usages?currentUserId=${currentUserId}&currentCarId=${currentCarId}&pageIndex=1&pageSize=8&showToast=success`
 
         try {
             const urlCreateFuelUsages = PUBLIC_BASE_URL + PUBLIC_FUEL_USAGES_ENDPOINT
-            console.info(`POST ${urlCreateFuelUsages}, request body: ${JSON.stringify(createFuelUsageRequest)}`)
+            console.info(`POST ${urlCreateFuelUsages}, request body: ${requestBody}`)
 
             const response = await fetch(urlCreateFuelUsages, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(createFuelUsageRequest)
+                body: requestBody
             })
 
             if (!response.ok) {

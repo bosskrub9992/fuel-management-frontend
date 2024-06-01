@@ -96,7 +96,7 @@ export const actions = {
 
         const putFuelUsageRequest: PutFuelUsageRequest = {
             currentCarId: currentCarId,
-            fuelUseTime: rawFuelUseTime + "+07:00",
+            fuelUseTime: rawFuelUseTime,
             fuelPrice: fuelPrice,
             fuelUsers: fuelUsers,
             description: description,
@@ -104,18 +104,19 @@ export const actions = {
             kilometerAfterUse: kilometerAfterUse,
         }
 
+        let requestBody = JSON.stringify(putFuelUsageRequest)
         let showToast = "updateSuccess"
 
         try {
             const urlPutFuelUsageById = PUBLIC_BASE_URL + PUBLIC_FUEL_USAGES_ENDPOINT + `/${fuelUsageId}`
-            console.info(`PUT ${urlPutFuelUsageById}, request body: ${JSON.stringify(putFuelUsageRequest)}`)
+            console.info(`PUT ${urlPutFuelUsageById}, request body: ${requestBody}`)
 
             const response = await fetch(urlPutFuelUsageById, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(putFuelUsageRequest)
+                body: requestBody
             })
             if (!response.ok) {
                 const { code, message, data } = await response.json()

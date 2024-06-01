@@ -10,6 +10,9 @@
 	});
 </script>
 
+<!-- for fixing html input element on IOS can not specify second -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 <!-- top navigation -->
 <header class="flex flex-col antialiased">
 	<nav class="bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-900 order-1">

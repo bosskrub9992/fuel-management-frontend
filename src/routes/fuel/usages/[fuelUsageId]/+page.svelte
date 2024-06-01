@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { onMount } from 'svelte';
+	import flatpickr from 'flatpickr';
 
 	export let data: PageData;
 
@@ -28,14 +30,33 @@
 	}
 	$: payEachDisplay = payEach.toFixed(2);
 
-	let fuelUseTime = new Date(data.getFuelUsageByIdResponse.fuelUseTime);
-	let year = fuelUseTime.getFullYear();
-	let month = ('0' + (fuelUseTime.getMonth() + 1)).slice(-2);
-	let date = ('0' + fuelUseTime.getDate()).slice(-2);
-	let hour = ('0' + fuelUseTime.getHours()).slice(-2);
-	let minute = ('0' + fuelUseTime.getMinutes()).slice(-2);
-    let second = ('0' + fuelUseTime.getSeconds()).slice(-2);
-	let fuelUseTimeBind = `${year}-${month}-${date}T${hour}:${minute}:${second}`;
+	let defaultFuelUseTime = new Date(data.getFuelUsageByIdResponse.fuelUseTime);
+
+	let year = defaultFuelUseTime.getFullYear();
+	let month = ('0' + (defaultFuelUseTime.getMonth() + 1)).slice(-2);
+	let date = ('0' + defaultFuelUseTime.getDate()).slice(-2);
+	let hour = ('0' + defaultFuelUseTime.getHours()).slice(-2);
+	let minute = ('0' + defaultFuelUseTime.getMinutes()).slice(-2);
+	let second = ('0' + defaultFuelUseTime.getSeconds()).slice(-2);
+
+	let fuelUseTime = `${year}-${month}-${date}T${hour}:${minute}:${second}+07:00`;
+	let fuelUseTimeInputElement: HTMLElement;
+
+	onMount(() => {
+		flatpickr(fuelUseTimeInputElement, {
+			allowInput: true,
+			clickOpens: true,
+			enableTime: true,
+			dateFormat: 'Y-m-dTH:i:S+07:00',
+			altInput: true,
+			altFormat: 'j F Y h:i:S K',
+			enableSeconds: true,
+			defaultDate: defaultFuelUseTime,
+			onValueUpdate: (selectedDates, dateStr, instance) => {
+				fuelUseTime = dateStr;
+			}
+		});
+	});
 </script>
 
 <section class="bg-white dark:bg-gray-900">
@@ -51,12 +72,11 @@
 						class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">วันที่</label
 					>
 					<input
-						type="datetime-local"
-                        step="1"
 						name="fuelUseTime"
 						id="fuelUseTime"
 						class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-						bind:value={fuelUseTimeBind}
+						bind:this={fuelUseTimeInputElement}
+						bind:value={fuelUseTime}
 						required
 					/>
 				</div>
