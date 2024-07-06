@@ -13,6 +13,8 @@
 	import { writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { tryit } from 'radash';
+	import { SvelteMap } from "svelte/reactivity";
 
 	export let data: PageData;
 
@@ -35,6 +37,16 @@
 	onMount(async () => {
 		const { initFlowbite } = await import('flowbite');
 		initFlowbite();
+
+		const [err, userUnpaidFuelUsages] = await tryit(getUserUnpaidFuelUsages)(data.currentUserId);
+		if (err) {
+			console.log(`error: ${err}`)
+			throw new Error('Your god is weak and could not be created');
+		}
+
+		if (userUnpaidFuelUsages) {
+			
+		}
 
 		try {
 			userUnpaidFuelUsages = await getUserUnpaidFuelUsages(data.currentUserId);

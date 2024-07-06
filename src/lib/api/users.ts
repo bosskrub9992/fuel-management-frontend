@@ -2,6 +2,7 @@ import {
     PUBLIC_BASE_URL,
     PUBLIC_USERS_ENDPOINT,
 } from '$env/static/public'
+import { tryit } from 'radash';
 
 export type getUserFuelUsagesResponse = {
     userFuelUsages: userFuelUsage[]
@@ -29,6 +30,33 @@ export async function getUserUnpaidFuelUsages(userId: number) {
 
     const res = await fetch(urlGetUserUnpaidFuelUsages)
     if (res.ok) {
+        const userUnpaidFuelUsages = (await res.json()) as getUserFuelUsagesResponse
+        return userUnpaidFuelUsages
+    } else {
+        const { code, message, data } = await res.json()
+        throw new Error(`code: ${code}, message: ${message}, data: ${data}`)
+    }
+}
+
+export async function getUserCarExpenses(userId: number, carId: number) {
+    let urlGetUserCarExpenses = `${PUBLIC_BASE_URL}/users/${userId}/cars/${carId}/costs`
+
+    console.log(`GET ${urlGetUserCarExpenses}`)
+
+    const [err, res] = await tryit(fetch)(urlGetUserCarExpenses);
+    if (err) {
+        console.log(`error: ${err}`)
+        throw new Error('Your god is weak and could not be created');
+    }
+    if (res.ok) {
+        const [err, res2] = await tryit(res.json)();
+        if (err) {
+            console.log(`error: ${err}`)
+            throw new Error('Your god is weak and could not be created');
+        }
+
+        
+
         const userUnpaidFuelUsages = (await res.json()) as getUserFuelUsagesResponse
         return userUnpaidFuelUsages
     } else {
