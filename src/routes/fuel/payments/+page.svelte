@@ -5,126 +5,121 @@
 	import ToastFailed from '$lib/components/toastFailed.svelte';
 	import ToastSucceeded from '$lib/components/toastSucceeded.svelte';
 	import type {
-		getUserFuelUsagesResponse,
-		patchUserFuelUsagesPaymentStatusRequest
+		getUserUnpaidCarActivityResponse,
+		patchUserUnpaidCarActivityRequest
 	} from '$lib/api/users';
-	import { getUserUnpaidFuelUsages, patchUserFuelUsagesPaymentStatus } from '$lib/api/users';
+	import {
+		getUserUnpaidCarActivity,
+		patchUserUnpaidCarActivity
+	} from '$lib/api/users';
 	import { PUBLIC_BANK_ACCOUNT_NO, PUBLIC_BANK } from '$env/static/public';
-	import { writable } from 'svelte/store';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
 	export let data: PageData;
 
-	type car = {
-		index: number;
-		selectedFuelUsageUserIds: number[];
-		selectedTotalMoney: number;
-		allFuelUsageUserIds: number[];
-		allTotalMoney: number;
-		allSelected: boolean;
-		isPaying: boolean;
-	};
+	let selectedFuelUsageUserIds: number[] = [];
+	let selectedFuelUsageTotalMoney = 0;
+	let allFuelUsageUserIds: number[] = [];
+	let totalMoneyIfSelectedAllFuelUsage = 0;
+	$: allSelectedFuelUsage = selectedFuelUsageUserIds.length == allFuelUsageUserIds.length;
 
-	const cars = writable<car[]>([]);
+	let selectedFuelRefillIds: number[] = [];
+	let selectedFuelRefillTotalMoney = 0;
+	let allFuelRefillIds: number[] = [];
+	let totalMoneyIfSelectedAllFuelRefill = 0;
+	$: allSelectedFuelRefill = selectedFuelRefillIds.length == allFuelRefillIds.length;
 
-	let userUnpaidFuelUsages: getUserFuelUsagesResponse;
+	let isPaying = false;
+	$: totalMoney = selectedFuelUsageTotalMoney - selectedFuelRefillTotalMoney;
+
+	let userUnpaidCarActivity: getUserUnpaidCarActivityResponse;
 	let isLoading = true;
-	let errorOccured: unknown;
+	let errorOccurred: unknown;
 
 	onMount(async () => {
 		const { initFlowbite } = await import('flowbite');
 		initFlowbite();
 
-		try {
-			userUnpaidFuelUsages = await getUserUnpaidFuelUsages(data.currentUserId);
-
-			for (let carIdx = 0; carIdx < userUnpaidFuelUsages.userFuelUsages.length; carIdx++) {
-				$cars = [
-					...$cars,
-					{
-						index: carIdx,
-						selectedFuelUsageUserIds: [],
-						selectedTotalMoney: 0,
-						allFuelUsageUserIds: [],
-						allTotalMoney: 0,
-						allSelected: true,
-						isPaying: false
-					}
-				];
-				for (const fuelUsage of userUnpaidFuelUsages.userFuelUsages[carIdx].fuelUsages) {
-					$cars[carIdx] = {
-						index: carIdx,
-						selectedFuelUsageUserIds: [
-							...$cars[carIdx].selectedFuelUsageUserIds,
-							fuelUsage.fuelUsageUserId
-						],
-						selectedTotalMoney: $cars[carIdx].selectedTotalMoney + parseFloat(fuelUsage.payEach),
-						allFuelUsageUserIds: [...$cars[carIdx].allFuelUsageUserIds, fuelUsage.fuelUsageUserId],
-						allTotalMoney: $cars[carIdx].allTotalMoney + parseFloat(fuelUsage.payEach),
-						allSelected: true,
-						isPaying: false
-					};
-				}
-			}
-		} catch (error) {
-			errorOccured = error;
+		let [err, getUserUnpaidCarActivityResult] = await getUserUnpaidCarActivity(
+			data.currentUserId,
+			data.currentCarId
+		);
+		if (err || getUserUnpaidCarActivityResult == undefined) {
+			errorOccurred = err;
 		}
+		if (getUserUnpaidCarActivityResult) {
+			userUnpaidCarActivity = getUserUnpaidCarActivityResult.userUnpaidCarActivity;
+
+			selectedFuelUsageUserIds = getUserUnpaidCarActivityResult.selectedUnpaidFuelUsageUserIds;
+			allFuelUsageUserIds = getUserUnpaidCarActivityResult.selectedUnpaidFuelUsageUserIds;
+			selectedFuelUsageTotalMoney = getUserUnpaidCarActivityResult.totalMoneySelectedUnpaidFuelUsage;
+			totalMoneyIfSelectedAllFuelUsage = getUserUnpaidCarActivityResult.totalMoneySelectedUnpaidFuelUsage;
+
+			selectedFuelRefillIds = getUserUnpaidCarActivityResult.selectedUnpaidFuelRefillIds;
+			allFuelRefillIds = getUserUnpaidCarActivityResult.selectedUnpaidFuelRefillIds;
+			selectedFuelRefillTotalMoney = getUserUnpaidCarActivityResult.totalMoneySelectedUnpaidFuelRefill;
+			totalMoneyIfSelectedAllFuelRefill = getUserUnpaidCarActivityResult.totalMoneySelectedUnpaidFuelRefill;
+		}
+
 		isLoading = false;
 	});
 
-	function toggleAll(carIdx: number) {
-		if ($cars[carIdx].allSelected) {
-			$cars[carIdx].selectedFuelUsageUserIds = [];
-			$cars[carIdx].selectedTotalMoney = 0;
+	function toggleAllFuelUsage() {
+		if (allSelectedFuelUsage) {
+			selectedFuelUsageUserIds = [];
+			selectedFuelUsageTotalMoney = 0;
 		} else {
-			$cars[carIdx].selectedFuelUsageUserIds = [...$cars[carIdx].allFuelUsageUserIds];
-			$cars[carIdx].selectedTotalMoney = $cars[carIdx].allTotalMoney;
+			selectedFuelUsageUserIds = [...allFuelUsageUserIds];
+			selectedFuelUsageTotalMoney = totalMoneyIfSelectedAllFuelUsage;
 		}
 	}
 
-	cars.subscribe(($cars) => {
-		for (const c of $cars) {
-			$cars[c.index].allSelected =
-				c.allFuelUsageUserIds.length === c.selectedFuelUsageUserIds.length;
-		}
-	});
-
-	function calculateTotalMoney(e: Event, carIdx: number, payEach: number) {
-		let target = e.target as HTMLInputElement;
-		if (target.checked) {
-			$cars[carIdx].selectedTotalMoney += payEach;
+	function toggleAllFuelRefill() {
+		if (allSelectedFuelRefill) {
+			selectedFuelRefillIds = [];
+			selectedFuelRefillTotalMoney = 0;
 		} else {
-			$cars[carIdx].selectedTotalMoney -= payEach;
+			selectedFuelRefillIds = [...allFuelRefillIds];
+			selectedFuelRefillTotalMoney = totalMoneyIfSelectedAllFuelRefill;
 		}
 	}
 
-	function pay(carIdx: number) {
-		$cars[carIdx].isPaying = true;
+	function calculateFuelUsageTotalPayEach(e: Event, payEach: number) {
+		let fuelUsage = e.target as HTMLInputElement;
+		if (fuelUsage.checked) {
+			selectedFuelUsageTotalMoney += payEach;
+		} else {
+			selectedFuelUsageTotalMoney -= payEach;
+		}
+	}
 
-		let req: patchUserFuelUsagesPaymentStatusRequest = {
-			userFuelUsages: []
+	function calculateFuelRefillTotalMoney(e: Event, amount: number) {
+		let fuelRefill = e.target as HTMLInputElement;
+		if (fuelRefill.checked) {
+			selectedFuelRefillTotalMoney += amount;
+		} else {
+			selectedFuelRefillTotalMoney -= amount;
+		}
+	}
+
+	async function pay() {
+		isPaying = true;
+
+		let req: patchUserUnpaidCarActivityRequest = {
+			fuelUsageUserIds: selectedFuelUsageUserIds,
+			fuelRefillIds: selectedFuelRefillIds
 		};
-		for (const selectedFuelUsageUserId of $cars[carIdx].selectedFuelUsageUserIds) {
-			req.userFuelUsages = [
-				...req.userFuelUsages,
-				{
-					id: selectedFuelUsageUserId,
-					isPaid: true
-				}
-			];
+
+		let err = await patchUserUnpaidCarActivity(data.currentUserId, data.currentCarId, req);
+		if (err) {
+			console.log('patchUserUnpaidCarActivity error: ', err);
+			displayToast('paymentFailed');
+			isPaying = false;
+			return;
 		}
-		patchUserFuelUsagesPaymentStatus(data.currentUserId, req)
-			.then(() => {
-				reloadPage('paymentSucceeded');
-			})
-			.catch((reason) => {
-				console.log(reason);
-				displayToast('paymentFailed');
-			})
-			.finally(() => {
-				$cars[carIdx].isPaying = false;
-			});
+
+		reloadPage('paymentSucceeded');
 	}
 
 	$: showToast = $page.url.searchParams.get('showToast');
@@ -154,103 +149,235 @@
 	<div class="min-h-screen flex items-center justify-center">
 		<Spinner />
 	</div>
-{:else if userUnpaidFuelUsages.userFuelUsages.length == 0}
+
+{:else if userUnpaidCarActivity.fuelUsages.length == 0 && userUnpaidCarActivity.fuelRefills.length == 0}
 	<div class="flex justify-center items-center h-screen">
 		<div class="flex flex-col items-center justify-center">
 			<p class="text-lg">คุณไม่มีรายการค้างจ่ายแล้ว</p>
 			<p class="text-lg">🎉🎉🎉</p>
 		</div>
 	</div>
-{:else if userUnpaidFuelUsages.userFuelUsages.length > 0}
+
+{:else if userUnpaidCarActivity.fuelUsages.length > 0 || userUnpaidCarActivity.fuelRefills.length > 0}
 	<h2
 		class="pl-4 mb-4 text-xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl dark:text-white"
 	>
 		รายการรอคุณจ่าย
 	</h2>
-	{#each userUnpaidFuelUsages.userFuelUsages as userFuelUsage, i}
-		<!-- table -->
-		<section class="bg-gray-50 dark:bg-gray-900 p-3 antialiased">
-			<div class="mx-auto max-w-screen-xl px-0 lg:px-12">
-				<div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
-					<div class="text-sm flex flex-row px-3 py-3">
-						<div>
-							<p>รถยนต์</p>
-							<p class="py-2">บัญชีธนาคาร</p>
-						</div>
-						<div class="px-7">
-							<p class="font-bold">{userFuelUsage.car.name}</p>
-							<div class="inline-flex">
-								<p class="font-bold py-2">{PUBLIC_BANK}</p>
-								<p class="font-bold py-2 pl-2 pr-3">{PUBLIC_BANK_ACCOUNT_NO}</p>
-							</div>
+	
+	<section class="bg-gray-50 dark:bg-gray-900 p-2 antialiased">
+		<div class="mx-auto max-w-screen-xl px-0 lg:px-12">
+			<div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+				<div class="text-sm flex flex-row px-3 py-3">
+					<div>
+						<p>รถยนต์</p>
+						<p class="pt-2">บัญชีธนาคาร</p>
+					</div>
+					<div class="pl-7">
+						<p class="font-bold">{data.currentCar?.name}</p>
+						<div class="inline-flex">
+							<p class="font-bold pt-2">{PUBLIC_BANK}</p>
+							<p class="font-bold pt-2 pl-2">{PUBLIC_BANK_ACCOUNT_NO}</p>
 						</div>
 					</div>
-					<div class="overflow-x-auto">
-						<table class="w-full text-sm text-center text-gray-500 dark:text-gray-400">
-							<thead
-								class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
-							>
-								<tr>
-									<th scope="col" class="p-4">
-										<div class="flex items-center">
-											<input
-												id="checkbox-all-search"
-												type="checkbox"
-												on:click={() => {
-													toggleAll(i);
-												}}
-												checked={$cars[i].allSelected}
-												class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-											/>
-											<label for="checkbox-all-search" class="sr-only">checkbox</label>
-										</div>
-									</th>
-									<th scope="col" class="px-2 py-3">วันที่</th>
-									<th scope="col" class="px-2 py-3">คนนั่ง</th>
-									<th scope="col" class="px-2 py-3">รายละเอียด</th>
-									<th scope="col" class="px-2 py-3">จ่ายคนละ</th>
-								</tr>
-							</thead>
-							<tbody>
-								{#each userFuelUsage.fuelUsages as fuelUsage}
-									<tr class="border-b dark:border-gray-700">
-										<td class="w-4 p-4">
+				</div>
+
+				<!-- accordion fuel usage -->
+				<div class="container mx-auto bg-white p-2">
+					<details
+						class="flex items-center w-full py-5 px-2 font-medium rtl:text-right text-gray-500 border border-b-0 border-gray-200 rounded-t-xl dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3 [&_svg]:open:-rotate-180"
+					>
+						<summary
+							class="flex cursor-pointer list-none items-center gap-4 justify-between text-black"
+						>
+							<div class="flex justify-between pl-2">
+								<svg
+									class="inline rotate-0 transform text-blue-700 transition-all duration-300"
+									fill="none"
+									height="20"
+									width="20"
+									stroke="currentColor"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									viewBox="0 0 24 24"
+								>
+									<polyline points="6 9 12 15 18 9"></polyline>
+								</svg>
+								<strong class="pl-3">ใช้น้ำมัน</strong>
+							</div>
+							<strong class="pr-4">฿{selectedFuelUsageTotalMoney}</strong>
+						</summary>
+
+						<!-- table fuel usage -->
+						<div class="overflow-x-auto pt-3">
+							<table class="w-full text-sm text-center text-gray-500 dark:text-gray-400">
+								<thead
+									class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+								>
+									<tr>
+										<th scope="col" class="p-4">
 											<div class="flex items-center">
 												<input
-													id="checkbox-{fuelUsage.fuelUsageUserId}"
+													id="checkbox-all-search"
 													type="checkbox"
-													value={fuelUsage.fuelUsageUserId}
-													bind:group={$cars[i].selectedFuelUsageUserIds}
-													on:change={(e) => {
-														calculateTotalMoney(e, i, parseFloat(fuelUsage.payEach));
+													on:click={() => {
+														toggleAllFuelUsage();
 													}}
+													checked={allSelectedFuelUsage}
 													class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
 												/>
-												<label for="checkbox-{fuelUsage.fuelUsageUserId}" class="sr-only"
-													>checkbox</label
-												>
+												<label for="checkbox-all-search" class="sr-only">checkbox</label>
 											</div>
-										</td>
-										<td id="td-{fuelUsage.fuelUsageUserId}-FuelUsetime" class="px-2 py-3">
-											{fuelUsage.fuelUseTime}</td
-										>
-										<td id="td-{fuelUsage.fuelUsageUserId}-FuelUsers" class="px-2 py-3 align-middle"
-											>{fuelUsage.fuelUsers}</td
-										>
-										<td id="td-{fuelUsage.fuelUsageUserId}-Description" class="px-2 py-3"
-											>{fuelUsage.description}</td
-										>
-										<td id="td-{fuelUsage.fuelUsageUserId}-PayEach" class="px-2 py-3"
-											>{'฿' + fuelUsage.payEach}</td
-										>
+										</th>
+										<th scope="col" class="px-2 py-3">วันที่</th>
+										<th scope="col" class="px-2 py-3">คนนั่ง</th>
+										<th scope="col" class="px-2 py-3">รายละเอียด</th>
+										<th scope="col" class="px-2 py-3">จ่ายคนละ</th>
 									</tr>
-								{/each}
-							</tbody>
-						</table>
-					</div>
+								</thead>
+								<tbody>
+									{#each userUnpaidCarActivity.fuelUsages as fuelUsage}
+										<tr class="border-b dark:border-gray-700">
+											<td class="w-4 p-4">
+												<div class="flex items-center">
+													<input
+														id="checkbox-fuel-usage-{fuelUsage.fuelUsageUserId}"
+														type="checkbox"
+														value={fuelUsage.fuelUsageUserId}
+														bind:group={selectedFuelUsageUserIds}
+														on:change={(e) => {
+															calculateFuelUsageTotalPayEach(e, parseFloat(fuelUsage.payEach));
+														}}
+														class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+													/>
+													<label
+														for="checkbox-fuel-usage-{fuelUsage.fuelUsageUserId}"
+														class="sr-only">checkbox</label
+													>
+												</div>
+											</td>
+											<td
+												id="td-fuel-usage-{fuelUsage.fuelUsageUserId}-FuelUsetime"
+												class="px-2 py-3"
+											>
+												{fuelUsage.fuelUseTime}</td
+											>
+											<td
+												id="td-fuel-usage-{fuelUsage.fuelUsageUserId}-FuelUsers"
+												class="px-2 py-3 align-middle">{fuelUsage.fuelUsers}</td
+											>
+											<td
+												id="td-fuel-usage-{fuelUsage.fuelUsageUserId}-Description"
+												class="px-2 py-3">{fuelUsage.description}</td
+											>
+											<td id="td-fuel-usage-{fuelUsage.fuelUsageUserId}-PayEach" class="px-2 py-3"
+												>{'฿' + fuelUsage.payEach}</td
+											>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						</div>
+					</details>
+
+					<!-- accordion fuel refill -->
+					<details
+						class=" flex items-center w-full py-5 px-2 font-medium rtl:text-right text-gray-500 border border-gray-200 rounded-b-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3 [&_svg]:open:-rotate-180"
+					>
+						<summary
+							class="flex cursor-pointer list-none items-center gap-4 justify-between text-black"
+						>
+							<div class="flex justify-between pl-2">
+								<svg
+									class="inline rotate-0 transform text-blue-700 transition-all duration-300"
+									fill="none"
+									height="20"
+									width="20"
+									stroke="currentColor"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									viewBox="0 0 24 24"
+								>
+									<polyline points="6 9 12 15 18 9"></polyline>
+								</svg>
+								<strong class="pl-3">เติมน้ำมัน</strong>
+							</div>
+							<strong class="pr-4">฿{selectedFuelRefillTotalMoney}</strong>
+						</summary>
+
+						<!-- table fuel refill -->
+						<div class="overflow-x-auto pt-3">
+							<table class="w-full text-sm text-center text-gray-500 dark:text-gray-400">
+								<thead
+									class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+								>
+									<tr>
+										<th scope="col" class="p-4">
+											<div class="flex items-center">
+												<input
+													id="checkbox-all-fuel-refill"
+													type="checkbox"
+													on:click={() => {
+														toggleAllFuelRefill();
+													}}
+													checked={allSelectedFuelRefill}
+													class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+												/>
+												<label for="checkbox-all-fuel-refill" class="sr-only">checkbox</label>
+											</div>
+										</th>
+										<th scope="col" class="px-2 py-3">วันที่</th>
+										<th scope="col" class="px-2 py-3">สถานะการจ่ายจากกองกลาง</th>
+										<th scope="col" class="px-2 py-3">เป็นเงิน</th>
+									</tr>
+								</thead>
+								<tbody>
+									{#each userUnpaidCarActivity.fuelRefills as fuelRefill}
+										<tr class="border-b dark:border-gray-700">
+											<td class="w-4 p-4">
+												<div class="flex items-center">
+													<input
+														id="checkbox-fuel-refill-id-{fuelRefill.fuelRefillId}"
+														type="checkbox"
+														value={fuelRefill.fuelRefillId}
+														bind:group={selectedFuelRefillIds}
+														on:change={(e) => {
+															calculateFuelRefillTotalMoney(e, parseFloat(fuelRefill.totalMoney));
+														}}
+														class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+													/>
+													<label
+														for="checkbox-fuel-refill-id-{fuelRefill.fuelRefillId}"
+														class="sr-only">checkbox</label
+													>
+												</div>
+											</td>
+											<td
+												id="td-fuel-refill-{fuelRefill.fuelRefillId}-RefillTime"
+												class="px-2 py-3"
+											>
+												{fuelRefill.refillTime}</td
+											>
+											<td
+												id="td-fuel-refill-{fuelRefill.fuelRefillId}-Ispaid"
+												class="px-2 py-3 align-middle">{fuelRefill.isPaid}</td
+											>
+											<td id="td-fuel-refill-{fuelRefill.fuelRefillId}-TotalMoney" class="px-2 py-3"
+												>{'฿' + fuelRefill.totalMoney}</td
+											>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						</div>
+					</details>
+
+					<!-- summary and pay -->
 					<div class="flex flex-row justify-between px-5 pt-5 text-md">
 						<p>รวมทั้งหมด</p>
-						<p class="font-bold">฿{$cars[i].selectedTotalMoney}</p>
+						<p class="font-bold">฿{totalMoney}</p>
 					</div>
 					<div
 						class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4"
@@ -258,12 +385,9 @@
 						<div
 							class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0"
 						>
-							{#if !$cars[i].isPaying}
-								{#if $cars[i].selectedFuelUsageUserIds.length == 0}
+							{#if !isPaying}
+								{#if totalMoney == 0}
 									<button
-										on:click={() => {
-											pay(i);
-										}}
 										class="flex items-center justify-center text-white bg-primary-500 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-400 cursor-not-allowed"
 										disabled
 									>
@@ -272,11 +396,15 @@
 								{:else}
 									<button
 										on:click={() => {
-											pay(i);
+											pay();
 										}}
 										class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
 									>
-										จ่ายเงิน
+										{#if totalMoney >= 0}
+											จ่ายเงิน
+										{:else}
+											กองกลางจ่ายเงิน
+										{/if}
 									</button>
 								{/if}
 							{:else}
@@ -309,8 +437,8 @@
 					</div>
 				</div>
 			</div>
-		</section>
-	{/each}
+		</div>
+	</section>
 {:else}
-	{errorOccured}
+	{errorOccurred}
 {/if}
