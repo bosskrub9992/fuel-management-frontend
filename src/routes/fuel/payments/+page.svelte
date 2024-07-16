@@ -8,10 +8,7 @@
 		getUserUnpaidCarActivityResponse,
 		patchUserUnpaidCarActivityRequest
 	} from '$lib/api/users';
-	import {
-		getUserUnpaidCarActivity,
-		patchUserUnpaidCarActivity
-	} from '$lib/api/users';
+	import { getUserUnpaidCarActivity, patchUserUnpaidCarActivity } from '$lib/api/users';
 	import { PUBLIC_BANK_ACCOUNT_NO, PUBLIC_BANK } from '$env/static/public';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
@@ -53,13 +50,17 @@
 
 			selectedFuelUsageUserIds = getUserUnpaidCarActivityResult.selectedUnpaidFuelUsageUserIds;
 			allFuelUsageUserIds = getUserUnpaidCarActivityResult.selectedUnpaidFuelUsageUserIds;
-			selectedFuelUsageTotalMoney = getUserUnpaidCarActivityResult.totalMoneySelectedUnpaidFuelUsage;
-			totalMoneyIfSelectedAllFuelUsage = getUserUnpaidCarActivityResult.totalMoneySelectedUnpaidFuelUsage;
+			selectedFuelUsageTotalMoney =
+				getUserUnpaidCarActivityResult.totalMoneySelectedUnpaidFuelUsage;
+			totalMoneyIfSelectedAllFuelUsage =
+				getUserUnpaidCarActivityResult.totalMoneySelectedUnpaidFuelUsage;
 
 			selectedFuelRefillIds = getUserUnpaidCarActivityResult.selectedUnpaidFuelRefillIds;
 			allFuelRefillIds = getUserUnpaidCarActivityResult.selectedUnpaidFuelRefillIds;
-			selectedFuelRefillTotalMoney = getUserUnpaidCarActivityResult.totalMoneySelectedUnpaidFuelRefill;
-			totalMoneyIfSelectedAllFuelRefill = getUserUnpaidCarActivityResult.totalMoneySelectedUnpaidFuelRefill;
+			selectedFuelRefillTotalMoney =
+				getUserUnpaidCarActivityResult.totalMoneySelectedUnpaidFuelRefill;
+			totalMoneyIfSelectedAllFuelRefill =
+				getUserUnpaidCarActivityResult.totalMoneySelectedUnpaidFuelRefill;
 		}
 
 		isLoading = false;
@@ -149,7 +150,6 @@
 	<div class="min-h-screen flex items-center justify-center">
 		<Spinner />
 	</div>
-
 {:else if userUnpaidCarActivity.fuelUsages.length == 0 && userUnpaidCarActivity.fuelRefills.length == 0}
 	<div class="flex justify-center items-center h-screen">
 		<div class="flex flex-col items-center justify-center">
@@ -157,14 +157,13 @@
 			<p class="text-lg">🎉🎉🎉</p>
 		</div>
 	</div>
-
 {:else if userUnpaidCarActivity.fuelUsages.length > 0 || userUnpaidCarActivity.fuelRefills.length > 0}
 	<h2
 		class="pl-4 mb-4 text-xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl dark:text-white"
 	>
 		รายการรอคุณจ่าย
 	</h2>
-	
+
 	<section class="bg-gray-50 dark:bg-gray-900 p-2 antialiased">
 		<div class="mx-auto max-w-screen-xl px-0 lg:px-12">
 			<div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
@@ -187,26 +186,28 @@
 					<details
 						class="flex items-center w-full py-5 px-2 font-medium rtl:text-right text-gray-500 border border-b-0 border-gray-200 rounded-t-xl dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3 [&_svg]:open:-rotate-180"
 					>
-						<summary
-							class="flex cursor-pointer list-none items-center gap-4 justify-between text-black"
-						>
-							<div class="flex justify-between pl-2">
-								<svg
-									class="inline rotate-0 transform text-blue-700 transition-all duration-300"
-									fill="none"
-									height="20"
-									width="20"
-									stroke="currentColor"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									viewBox="0 0 24 24"
-								>
-									<polyline points="6 9 12 15 18 9"></polyline>
-								</svg>
-								<strong class="pl-3">ใช้น้ำมัน</strong>
+						<summary class="list-none">
+							<div
+								class="flex cursor-pointer list-none items-center gap-4 justify-between text-black"
+							>
+								<div class="flex justify-between pl-2">
+									<svg
+										class="inline rotate-0 transform text-blue-700 transition-all duration-300"
+										fill="none"
+										height="20"
+										width="20"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										viewBox="0 0 24 24"
+									>
+										<polyline points="6 9 12 15 18 9"></polyline>
+									</svg>
+									<strong class="pl-3">ใช้น้ำมัน</strong>
+								</div>
+								<strong class="pr-4">฿{selectedFuelUsageTotalMoney}</strong>
 							</div>
-							<strong class="pr-4">฿{selectedFuelUsageTotalMoney}</strong>
 						</summary>
 
 						<!-- table fuel usage -->
@@ -285,26 +286,28 @@
 					<details
 						class=" flex items-center w-full py-5 px-2 font-medium rtl:text-right text-gray-500 border border-gray-200 rounded-b-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3 [&_svg]:open:-rotate-180"
 					>
-						<summary
-							class="flex cursor-pointer list-none items-center gap-4 justify-between text-black"
-						>
-							<div class="flex justify-between pl-2">
-								<svg
-									class="inline rotate-0 transform text-blue-700 transition-all duration-300"
-									fill="none"
-									height="20"
-									width="20"
-									stroke="currentColor"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									viewBox="0 0 24 24"
-								>
-									<polyline points="6 9 12 15 18 9"></polyline>
-								</svg>
-								<strong class="pl-3">เติมน้ำมัน</strong>
+						<summary class="list-none">
+							<div
+								class="flex cursor-pointer list-none items-center gap-4 justify-between text-black"
+							>
+								<div class="flex justify-between pl-2">
+									<svg
+										class="inline rotate-0 transform text-blue-700 transition-all duration-300"
+										fill="none"
+										height="20"
+										width="20"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										viewBox="0 0 24 24"
+									>
+										<polyline points="6 9 12 15 18 9"></polyline>
+									</svg>
+									<strong class="pl-3">เติมน้ำมัน</strong>
+								</div>
+								<strong class="pr-4">฿{selectedFuelRefillTotalMoney}</strong>
 							</div>
-							<strong class="pr-4">฿{selectedFuelRefillTotalMoney}</strong>
 						</summary>
 
 						<!-- table fuel refill -->
