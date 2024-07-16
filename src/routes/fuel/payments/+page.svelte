@@ -186,7 +186,7 @@
 					<details
 						class="flex items-center w-full py-5 px-2 font-medium rtl:text-right text-gray-500 border border-b-0 border-gray-200 rounded-t-xl dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3 [&_svg]:open:-rotate-180"
 					>
-						<summary class="list-none">
+						<summary class="list-none [&::-webkit-details-marker]:hidden">
 							<div
 								class="flex cursor-pointer list-none items-center gap-4 justify-between text-black"
 							>
@@ -286,7 +286,7 @@
 					<details
 						class=" flex items-center w-full py-5 px-2 font-medium rtl:text-right text-gray-500 border border-gray-200 rounded-b-xl focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3 [&_svg]:open:-rotate-180"
 					>
-						<summary class="list-none">
+						<summary class="list-none [&::-webkit-details-marker]:hidden">
 							<div
 								class="flex cursor-pointer list-none items-center gap-4 justify-between text-black"
 							>
