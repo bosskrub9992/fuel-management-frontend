@@ -3,34 +3,43 @@
 	import { onMount } from 'svelte';
 	import flatpickr from 'flatpickr';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
 
-	let fuelPrice = Number(data.getFuelUsageByIdResponse.fuelPrice);
-	let fuelPriceDisplay: string = fuelPrice.toFixed(2);
-	let kilometerBeforeUse = data.getFuelUsageByIdResponse.kilometerBeforeUse;
-	let kilometerAfterUse = data.getFuelUsageByIdResponse.kilometerAfterUse;
-	let description = data.getFuelUsageByIdResponse.description;
-	$: total = fuelPrice * (kilometerBeforeUse - kilometerAfterUse);
-	$: totalString = total.toFixed(2);
+	let { data = $bindable() }: Props = $props();
 
-	let fuelUserIds: number[] = [];
-	let paidUsers: number[] = [];
-	for (const fuelUser of data.getFuelUsageByIdResponse.fuelUsers) {
-		fuelUserIds.push(fuelUser.userId);
+	const fuelUsage = data.getFuelUsageByIdResponse;
+	const defaultFuelPrice = Number(fuelUsage.fuelPrice);
+	const defaultKmBeforeUse = fuelUsage.kilometerBeforeUse;
+	const defaultKmAfterUse = fuelUsage.kilometerAfterUse;
+	const defaultTotal = defaultFuelPrice * (defaultKmBeforeUse - defaultKmAfterUse);
+	let defaultFuelUserIds: number[] = [];
+	let defaultPaidUsers: number[] = [];
+	for (const fuelUser of fuelUsage.fuelUsers) {
+		defaultFuelUserIds.push(fuelUser.userId);
 		if (fuelUser.isPaid) {
-			paidUsers.push(fuelUser.userId);
+			defaultPaidUsers.push(fuelUser.userId);
 		}
 	}
 
-	$: payEach = total;
-	$: {
+	let fuelPriceDisplay = $state(defaultFuelPrice.toFixed(2));
+	let kilometerBeforeUse = $state(defaultKmBeforeUse);
+	let kilometerAfterUse = $state(defaultKmAfterUse);
+	let description = $state(fuelUsage.description);
+	let total = $derived((defaultFuelPrice * (kilometerBeforeUse - kilometerAfterUse)).toFixed(2));
+
+	let fuelUserIds = $state<number[]>(defaultFuelUserIds);
+	let paidUsers = $state<number[]>(defaultPaidUsers);
+
+	let payEach = $derived.by(() => {
 		if (fuelUserIds.length > 0) {
-			payEach = total / fuelUserIds.length;
+			return (Number(total) / fuelUserIds.length).toFixed(2);
 		}
-	}
-	$: payEachDisplay = payEach.toFixed(2);
+		return total;
+	});
 
-	let defaultFuelUseTime = new Date(data.getFuelUsageByIdResponse.fuelUseTime);
+	let defaultFuelUseTime = new Date(fuelUsage.fuelUseTime);
 	let year = defaultFuelUseTime.getFullYear();
 	let month = ('0' + (defaultFuelUseTime.getMonth() + 1)).slice(-2);
 	let date = ('0' + defaultFuelUseTime.getDate()).slice(-2);
@@ -38,24 +47,26 @@
 	let minute = ('0' + defaultFuelUseTime.getMinutes()).slice(-2);
 	let second = ('0' + defaultFuelUseTime.getSeconds()).slice(-2);
 
-	let fuelUseTime = `${year}-${month}-${date}T${hour}:${minute}:${second}+07:00`;
-	let fuelUseTimeInputElement: HTMLElement;
+	let fuelUseTime = $state(`${year}-${month}-${date}T${hour}:${minute}:${second}+07:00`);
+	let fuelUseTimeInputElement = $state<HTMLElement>();
 
 	onMount(() => {
-		flatpickr(fuelUseTimeInputElement, {
-			disableMobile: true,
-			allowInput: true,
-			clickOpens: true,
-			enableTime: true,
-			dateFormat: 'Y-m-dTH:i:S+07:00',
-			altInput: true,
-			altFormat: 'j F Y h:i:S K',
-			enableSeconds: true,
-			defaultDate: defaultFuelUseTime,
-			onValueUpdate: (selectedDates, dateStr, instance) => {
-				fuelUseTime = dateStr;
-			}
-		});
+		if (fuelUseTimeInputElement) {
+			flatpickr(fuelUseTimeInputElement, {
+				disableMobile: true,
+				allowInput: true,
+				clickOpens: true,
+				enableTime: true,
+				dateFormat: 'Y-m-dTH:i:S+07:00',
+				altInput: true,
+				altFormat: 'j F Y h:i:S K',
+				enableSeconds: true,
+				defaultDate: defaultFuelUseTime,
+				onValueUpdate: (selectedDates, dateStr, instance) => {
+					fuelUseTime = dateStr;
+				}
+			});
+		}
 	});
 </script>
 
@@ -198,7 +209,7 @@
 						type="number"
 						name="total"
 						id="total"
-						bind:value={totalString}
+						value={total}
 						disabled
 						class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
 						required
@@ -212,7 +223,7 @@
 						type="number"
 						name="payEach"
 						id="payEach"
-						bind:value={payEachDisplay}
+						value={payEach}
 						disabled
 						class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
 						required

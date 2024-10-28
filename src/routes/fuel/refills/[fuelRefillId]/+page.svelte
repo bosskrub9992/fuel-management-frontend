@@ -3,15 +3,22 @@
 	import { onMount } from 'svelte';
 	import flatpickr from 'flatpickr';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
 
-	let kilometerBeforeRefill = data.getFuelRefillByIdResponse.kilometerBeforeRefill;
-	let kilometerAfterRefill = data.getFuelRefillByIdResponse.kilometerAfterRefill;
-	let totalMoney = data.getFuelRefillByIdResponse.totalMoney;
-	$: pricePerKm = totalMoney / (kilometerAfterRefill - kilometerBeforeRefill);
-	$: pricePerKmString = pricePerKm.toFixed(2);
+	let { data = $bindable() }: Props = $props();
 
-	let defaultRefillTime = new Date(data.getFuelRefillByIdResponse.refillTime);
+	const refill = data.getFuelRefillByIdResponse;
+
+	let kilometerBeforeRefill = $state(refill.kilometerBeforeRefill);
+	let kilometerAfterRefill = $state(refill.kilometerAfterRefill);
+	let totalMoney = $state(refill.totalMoney);
+	let pricePerKmString = $derived(
+		(totalMoney / (kilometerAfterRefill - kilometerBeforeRefill)).toFixed(2)
+	);
+
+	let defaultRefillTime = new Date(refill.refillTime);
 	let year = defaultRefillTime.getFullYear();
 	let month = ('0' + (defaultRefillTime.getMonth() + 1)).slice(-2);
 	let date = ('0' + defaultRefillTime.getDate()).slice(-2);
@@ -19,34 +26,34 @@
 	let minute = ('0' + defaultRefillTime.getMinutes()).slice(-2);
 	let second = ('0' + defaultRefillTime.getSeconds()).slice(-2);
 
-	let refillTime = `${year}-${month}-${date}T${hour}:${minute}:${second}`;
-	let refillTimeInputElement: HTMLElement;
+	let refillTime = $state(`${year}-${month}-${date}T${hour}:${minute}:${second}`);
+	let refillTimeInputElement = $state<HTMLElement>();
 
 	onMount(() => {
-		flatpickr(refillTimeInputElement, {
-			disableMobile: true,
-			allowInput: true,
-			clickOpens: true,
-			enableTime: true,
-			dateFormat: 'Y-m-dTH:i:S+07:00',
-			altInput: true,
-			altFormat: 'j F Y h:i:S K',
-			enableSeconds: true,
-			defaultDate: defaultRefillTime,
-			onValueUpdate: (selectedDates, dateStr, instance) => {
-				refillTime = dateStr;
-			}
-		});
+		if (refillTimeInputElement) {
+			flatpickr(refillTimeInputElement, {
+				disableMobile: true,
+				allowInput: true,
+				clickOpens: true,
+				enableTime: true,
+				dateFormat: 'Y-m-dTH:i:S+07:00',
+				altInput: true,
+				altFormat: 'j F Y h:i:S K',
+				enableSeconds: true,
+				defaultDate: defaultRefillTime,
+				onValueUpdate: (selectedDates, dateStr, instance) => {
+					refillTime = dateStr;
+				}
+			});
+		}
 	});
 
-	$: isPaid = false;
-	$: {
-		if (data.getFuelRefillByIdResponse.isPaid) {
-			isPaid = true;
-		}
+	let isPaid = $state(false);
+	if (data.getFuelRefillByIdResponse.isPaid) {
+		isPaid = true;
 	}
 
-	let refillBy = data.getFuelRefillByIdResponse.refillBy;
+	let refillBy = $state(data.getFuelRefillByIdResponse.refillBy);
 </script>
 
 <section class="bg-white dark:bg-gray-900">
@@ -169,7 +176,7 @@
 						type="number"
 						name="pricePerKmString"
 						id="pricePerKmString"
-						bind:value={pricePerKmString}
+						value={pricePerKmString}
 						disabled
 						class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
 						required

@@ -3,13 +3,17 @@
 	import { onMount } from 'svelte';
 	import flatpickr from 'flatpickr';
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
 
-	let isPaid = false;
-	let kilometerBeforeRefill = data.latestKilometerAfterUse;
-	let kilometerAfterRefill = data.latestKilometerAfterUse;
-	let totalMoney = 1;
-	$: total = totalMoney / (kilometerAfterRefill - kilometerBeforeRefill);
+	let { data = $bindable() }: Props = $props();
+
+	let isPaid = $state(false);
+	let kilometerBeforeRefill = $state(data.latestKilometerAfterUse);
+	let kilometerAfterRefill = $state(data.latestKilometerAfterUse);
+	let totalMoney = $state(1);
+	let fuelPrice = $derived(totalMoney / (kilometerAfterRefill - kilometerBeforeRefill));
 
 	let defaultRefillTime = new Date();
 	let year = defaultRefillTime.getFullYear();
@@ -19,27 +23,29 @@
 	let minute = ('0' + defaultRefillTime.getMinutes()).slice(-2);
 	let second = ('0' + defaultRefillTime.getSeconds()).slice(-2);
 
-	let refillTime = `${year}-${month}-${date}T${hour}:${minute}:${second}+07:00`;
-	let refillTimeInputElement: HTMLElement;
+	let refillTime = $state(`${year}-${month}-${date}T${hour}:${minute}:${second}+07:00`);
+	let refillTimeInputElement = $state<HTMLElement>();
 
 	onMount(() => {
-		flatpickr(refillTimeInputElement, {
-			disableMobile: true,
-			allowInput: true,
-			clickOpens: true,
-			enableTime: true,
-			dateFormat: 'Y-m-dTH:i:S+07:00',
-			altInput: true,
-			altFormat: 'j F Y h:i:S K',
-			enableSeconds: true,
-			defaultDate: defaultRefillTime,
-			onValueUpdate: (selectedDates, dateStr, instance) => {
-				refillTime = dateStr;
-			}
-		});
+		if (refillTimeInputElement) {
+			flatpickr(refillTimeInputElement, {
+				disableMobile: true,
+				allowInput: true,
+				clickOpens: true,
+				enableTime: true,
+				dateFormat: 'Y-m-dTH:i:S+07:00',
+				altInput: true,
+				altFormat: 'j F Y h:i:S K',
+				enableSeconds: true,
+				defaultDate: defaultRefillTime,
+				onValueUpdate: (selectedDates, dateStr, instance) => {
+					refillTime = dateStr;
+				}
+			});
+		}
 	});
 
-	let refillBy = data.currentUserId;
+	let refillBy = $state(data.currentUserId);
 </script>
 
 <section class="bg-white dark:bg-gray-900">
@@ -74,7 +80,7 @@
 								id="isPaid"
 								type="checkbox"
 								name="isPaid"
-								bind:value={isPaid}
+								bind:checked={isPaid}
 								class="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
 							/>
 							<label
@@ -166,7 +172,7 @@
 						type="number"
 						name="fuelPrice"
 						id="fuelPrice"
-						bind:value={total}
+						value={fuelPrice}
 						class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
 						readonly
 						required

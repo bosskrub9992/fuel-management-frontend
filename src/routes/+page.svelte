@@ -1,6 +1,10 @@
 <script lang="ts">
 	import type { LayoutData } from './$types';
-	export let data: LayoutData;
+	interface Props {
+		data: LayoutData;
+	}
+
+	let { data }: Props = $props();
 </script>
 
 <div

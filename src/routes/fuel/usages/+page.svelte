@@ -1,37 +1,46 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { onMount } from 'svelte';
-	import type { FuelUsageDatum } from './+page.ts';
 	import { goto } from '$app/navigation';
 	import ToastFailed from '$lib/components/toastFailed.svelte';
 	import ToastSucceeded from '$lib/components/toastSucceeded.svelte';
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 
 	onMount(async () => {
 		const { initFlowbite } = await import('flowbite');
 		initFlowbite();
 	});
 
-	$: to = Math.min(data.pageIndex * data.pageSize, data.totalRecord);
+	let to = $derived(Math.min(data.pageIndex * data.pageSize, data.totalRecord));
 
-	$: showing = (data.pageIndex - 1) * data.pageSize + 1;
+	let showing = $derived((data.pageIndex - 1) * data.pageSize + 1);
 
-	let fuelUsageData: FuelUsageDatum[] = [];
-	$: if (data.fuelUsageData) {
-		fuelUsageData = data.fuelUsageData;
-	}
+	let fuelUsageData = $derived.by(() => {
+		if (data.fuelUsageData) {
+			return data.fuelUsageData;
+		}
+		return [];
+	});
 
-	$: nextPage = data.pageIndex + 1;
-	$: if (data.pageIndex >= data.totalPage) {
-		nextPage = data.totalPage;
-	}
+	let nextPage = $derived.by(() => {
+		if (data.pageIndex >= data.totalPage) {
+			return data.totalPage;
+		}
+		return data.pageIndex + 1;
+	});
 
-	$: previousPage = data.pageIndex - 1;
-	$: if (data.pageIndex <= 1) {
-		previousPage = 1;
-	}
+	let previousPage = $derived.by(() => {
+		if (data.pageIndex <= 1) {
+			return 1;
+		}
+		return data.pageIndex - 1;
+	});
 
-	let toastMessage = ''; // case noStatus
+	let toastMessage = $state(''); // case noStatus
 	switch (data.showToast) {
 		case 'noStatus':
 			toastMessage = '';
@@ -119,7 +128,7 @@
 					<tbody>
 						{#each fuelUsageData as fuelUsageDatum}
 							<tr
-								on:click={() => {
+								onclick={() => {
 									goto(
 										`/fuel/usages/${fuelUsageDatum.id}?currentUserId=${data.currentUser?.id}&currentCarId=${data.currentCar?.id}`
 									);

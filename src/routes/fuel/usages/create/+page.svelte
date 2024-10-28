@@ -3,24 +3,29 @@
 	import { onMount } from 'svelte';
 	import flatpickr from 'flatpickr';
 
-	export let data: PageData;
-
-	let fuelPrice = Number(data.latestFuelPrice);
-	let fuelPriceDisplay: string = fuelPrice.toFixed(2);
-	let kilometerBeforeUse = data.latestKilometerAfterUse;
-	let kilometerAfterUse = 0;
-	let description = '';
-	$: total = fuelPrice * (kilometerBeforeUse - kilometerAfterUse);
-	$: totalString = total.toFixed(2);
-	let fuelUserIds: number[] = [data.currentUserId];
-	let paidUsers: number[] = [];
-	$: payEach = total;
-	$: {
-		if (fuelUserIds.length > 0) {
-			payEach = total / fuelUserIds.length;
-		}
+	interface Props {
+		data: PageData;
 	}
-	$: payEachDisplay = payEach.toFixed(2);
+
+	let { data = $bindable() }: Props = $props();
+
+	const fuelPrice = Number(data.latestFuelPrice);
+
+	let fuelPriceDisplay = $state<string>(fuelPrice.toFixed(2));
+	let kilometerBeforeUse = $state(data.latestKilometerAfterUse);
+	let kilometerAfterUse = $state(0);
+	let description = $state('');
+	let total = $derived(fuelPrice * (kilometerBeforeUse - kilometerAfterUse));
+	let totalString = $derived(total.toFixed(2));
+	let fuelUserIds: number[] = $state([data.currentUserId]);
+	let paidUsers: number[] = $state([]);
+	let payEach = $derived.by(() => {
+		if (fuelUserIds.length > 0) {
+			return total / fuelUserIds.length;
+		}
+		return total;
+	});
+	let payEachDisplay = $derived(payEach.toFixed(2));
 
 	let defaultFuelUseTime = new Date();
 	let year = defaultFuelUseTime.getFullYear();
@@ -30,27 +35,29 @@
 	let minute = ('0' + defaultFuelUseTime.getMinutes()).slice(-2);
 	let second = ('0' + defaultFuelUseTime.getSeconds()).slice(-2);
 
-	let fuelUseTime = `${year}-${month}-${date}T${hour}:${minute}:${second}+07:00`;
-	let fuelUseTimeInputElement: HTMLElement;
+	let fuelUseTime = $state(`${year}-${month}-${date}T${hour}:${minute}:${second}+07:00`);
+	let fuelUseTimeInputElement = $state<HTMLElement>();
 
 	onMount(() => {
-		flatpickr(fuelUseTimeInputElement, {
-			disableMobile: true,
-			allowInput: true,
-			clickOpens: true,
-			enableTime: true,
-			dateFormat: 'Y-m-dTH:i:S+07:00',
-			altInput: true,
-			altFormat: 'j F Y h:i:S K',
-			enableSeconds: true,
-			defaultDate: defaultFuelUseTime,
-			onValueUpdate: (selectedDates, dateStr, instance) => {
-				fuelUseTime = dateStr;
-			}
-		});
+		if (fuelUseTimeInputElement) {
+			flatpickr(fuelUseTimeInputElement, {
+				disableMobile: true,
+				allowInput: true,
+				clickOpens: true,
+				enableTime: true,
+				dateFormat: 'Y-m-dTH:i:S+07:00',
+				altInput: true,
+				altFormat: 'j F Y h:i:S K',
+				enableSeconds: true,
+				defaultDate: defaultFuelUseTime,
+				onValueUpdate: (selectedDates, dateStr, instance) => {
+					fuelUseTime = dateStr;
+				}
+			});
+		}
 	});
 
-	$: disableButton = fuelUserIds.length == 0;
+	let disableButton = $derived(fuelUserIds.length == 0);
 </script>
 
 <section class="bg-white dark:bg-gray-900">
@@ -197,7 +204,7 @@
 						type="number"
 						name="total"
 						id="total"
-						bind:value={totalString}
+						value={totalString}
 						disabled
 						class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
 						required
@@ -211,7 +218,7 @@
 						type="number"
 						name="payEach"
 						id="payEach"
-						bind:value={payEachDisplay}
+						value={payEachDisplay}
 						disabled
 						class="bg-gray-200 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
 						required

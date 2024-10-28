@@ -2,7 +2,12 @@
 	import type { LayoutData } from './$types';
 	import { onMount } from 'svelte';
 
-	export let data: LayoutData;
+	interface Props {
+		data: LayoutData;
+		children?: import('svelte').Snippet;
+	}
+
+	let { data, children }: Props = $props();
 
 	onMount(async () => {
 		const { initFlowbite } = await import('flowbite');
@@ -86,7 +91,7 @@
 </header>
 
 <!-- main content -->
-<slot></slot>
+{@render children?.()}
 
 <!-- bottom navigation -->
 <div class="h-16 bg-white"></div>
